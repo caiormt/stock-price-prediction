@@ -1,0 +1,5 @@
+-Dfile.encoding=UTF8
+-Xss8M
+-Xmx1G
+-XX:ReservedCodeCacheSize=500M
+-XX:+UseG1GC

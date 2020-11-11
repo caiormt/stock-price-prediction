@@ -30,10 +30,13 @@ object App extends IOApp {
           _         <- Stream.eval(logger.info("Warming up..."))
           reader    <- Stream.eval(B3Reader.make[F])
           extractor <- Stream.eval(B3Extractor.make[F])
+          processor <- Stream.eval(LiveProcessor.make[F])
           _         <- Stream.eval(logger.info("Start processing..."))
           data       = reader.fromFile(Paths.get(path.toURI()))
-          alphabet  <- Stream.eval(extractor.toAlphabet(data))
-          _         <- Stream.eval(logger.info(s"Alphabet extracted: $alphabet"))
+          sequence  <- Stream.eval(extractor.toAlphabet(data))
+          _         <- Stream.eval(logger.info(s"Sequence extracted: $sequence"))
+          matrix    <- Stream.eval(Sync[F].delay(processor.build(sequence.substring(0, 10), sequence.substring(0, 10))))
+          _         <- Stream.eval(logger.info(s"\n${matrix.toString()}"))
         } yield ()
       }
       .compile

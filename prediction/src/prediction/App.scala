@@ -22,7 +22,7 @@ object App extends IOApp {
   override def run(args: List[String]): IO[ExitCode] =
     program[IO].as(ExitCode.Success)
 
-  private def program[F[_]: Sync: ContextShift]: F[Unit] =
+  private def program[F[_]: Concurrent: ContextShift]: F[Unit] =
     Stream
       .eval(Slf4jLogger.create[F])
       .flatMap { implicit logger =>
@@ -30,12 +30,14 @@ object App extends IOApp {
           _         <- Stream.eval(logger.info("Warming up..."))
           reader    <- Stream.eval(B3Reader.make[F])
           extractor <- Stream.eval(B3Extractor.make[F])
-          processor <- Stream.eval(LiveProcessor.make[F])
           _         <- Stream.eval(logger.info("Start processing..."))
           data       = reader.fromFile(Paths.get(path.toURI()))
           sequence  <- Stream.eval(extractor.toAlphabet(data))
           _         <- Stream.eval(logger.info(s"Sequence extracted: $sequence"))
-          matrix    <- Stream.eval(Sync[F].delay(processor.build(sequence.substring(0, 10), sequence.substring(0, 10))))
+          s          = sequence.substring(0, 10)
+          processor <- Stream.eval(LiveProcessor.make[F](s, s))
+          _         <- Stream.eval(processor.build())
+          matrix    <- Stream.eval(processor.getMatrix())
           _         <- Stream.eval(logger.info(s"\n${matrix.toString()}"))
         } yield ()
       }

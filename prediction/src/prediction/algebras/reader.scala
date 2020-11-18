@@ -20,7 +20,7 @@ trait Reader[F[_], A] {
 
 object B3Reader {
   def make[F[_]: Sync: ContextShift]: F[Reader[F, Entry]] =
-    Sync[F].delay(new B3Reader[F](chunkSize = 1024 * 1024 * 32 /*32 megabytes*/ ))
+    Sync[F].delay(new B3Reader[F](chunkSize = 1024 * 16))
 }
 
 final class B3Reader[F[_]: Sync: ContextShift] private (private val chunkSize: Int) extends Reader[F, Entry] {

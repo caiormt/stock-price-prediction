@@ -12,11 +12,13 @@ object b3 {
   type FileName = MatchesRegex[W.`"COTAHIST.[0-9]{4}"`.T]
   @newtype case class Filename(value: String Refined FileName)
 
-  /** Defines the base type of the entries that could possibly be found in the B3 file.
+  /**
+    * Defines the base type of the entries that could possibly be found in the B3 file.
     */
   sealed abstract class Entry extends Product with Serializable
 
-  /** Header entry type.
+  /**
+    * Header entry type.
     * Must be the first item in the file.
     * Defines the metadata of the file.
     *
@@ -26,7 +28,8 @@ object b3 {
     */
   final case class Header(fileName: Filename, sourceCode: String, fileGenerationDate: jt.LocalDate) extends Entry
 
-  /** Register entry type.
+  /**
+    * Register entry type.
     * Each row is a register defining the info about the stock in the specified `dateOfExchange`.
     *
     * @param dateOfExchange The date when this exchange ocurred.
@@ -63,7 +66,8 @@ object b3 {
       volTot: BigDecimal
   ) extends Entry
 
-  /** Trailer entry type.
+  /**
+    * Trailer entry type.
     * Must be the last item in the file.
     * Defines the metadata of the file and the total number of entries before it.
     *

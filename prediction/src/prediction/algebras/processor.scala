@@ -44,8 +44,8 @@ sealed abstract class NeedlemanWunsch[
   def choose(a: Score, b: Score, c: Score): Score
   def token2Sequence(token: Token): Sequence
 
-  def startAlignment(M: DenseMatrix[Score]): (Int, Int)
-  def continueAlignment(M: DenseMatrix[Score], i: Int, j: Int): Boolean
+  @inline def startAlignment(M: DenseMatrix[Score]): (Int, Int)
+  @inline def continueAlignment(V: Score, i: Int, j: Int): Boolean
 
   override def matrix(): F[DenseMatrix[Score]] =
     deferred.get.map(_.copy)
@@ -59,9 +59,9 @@ sealed abstract class NeedlemanWunsch[
              for (i <- 1 to `|s|`)
                for (j <- 1 to `|t|`) {
                  // format: off
-                 val a   = M(i    , j - 1) + score(`'-'`   , t(j - 1))
-                 val b   = M(i - 1, j - 1) + score(s(i - 1), t(j - 1))
-                 val c   = M(i - 1, j    ) + score(s(i - 1), `'-'`   )
+                 val a   = M(i    , j - 1) + score(`'-'`, t(j) )
+                 val b   = M(i - 1, j - 1) + score(s(i) , t(j) )
+                 val c   = M(i - 1, j    ) + score(s(i) , `'-'`)
                  M(i, j) = choose(a, b, c)
                  // format: on
                }
@@ -77,38 +77,33 @@ sealed abstract class NeedlemanWunsch[
       `~t` <- Sync[F].delay(DenseVector.zeros[Token](size))
       st   <- Sync[F].delay {
                 // Indexes
-                //val (_i, _j) = startAlignment(M)
-                var (i, j) = startAlignment(M) // `|s|` -> `|t|`
+                var (i, j) = startAlignment(M)
                 var k      = 0
 
-                //for (_ <- _i + 1 until i) up()
-                //for (_ <- _j + 1 until j) left()
-                //println(s"i = $i | j = $j | k = $k")
-
                 def diag(): Unit = {
-                  `~s`(k) = s(i - 1)
-                  `~t`(k) = t(j - 1)
+                  `~s`(k) = s(i)
+                  `~t`(k) = t(j)
                   i = i - 1; j = j - 1; k = k + 1
                 }
 
                 def left(): Unit = {
                   `~s`(k) = `'-'`
-                  `~t`(k) = t(j - 1)
+                  `~t`(k) = t(j)
                   j = j - 1; k = k + 1
                 }
 
                 def up(): Unit = {
-                  `~s`(k) = s(i - 1)
+                  `~s`(k) = s(i)
                   `~t`(k) = `'-'`
                   i = i - 1; k = k + 1
                 }
 
                 // Build the alignment
-                while (continueAlignment(M, i, j))
+                while (continueAlignment(M(i, j), i, j))
                   // format: off
-                  if      (M(i, j) === M(i - 1, j - 1) + score(s(i - 1), t(j - 1))) diag()
-                  else if (M(i, j) === M(i    , j - 1) + score(`'-'`   , t(j - 1))) left()
-                  else if (M(i, j) === M(i - 1, j    ) + score(s(i - 1), `'-'`   )) up()
+                  if      (M(i, j) === M(i - 1, j - 1) + score(s(i) , t(j)) ) diag()
+                  else if (M(i, j) === M(i    , j - 1) + score(`'-'`, t(j)) ) left()
+                  else if (M(i, j) === M(i - 1, j    ) + score(s(i) , `'-'`)) up()
                   // format: on
 
                 // Complete the remaining sequences
@@ -132,8 +127,8 @@ object GlobalProcessor {
 final class GlobalProcessor[F[_]: Concurrent] private (s: String, t: String)
     extends NeedlemanWunsch[F, String, Char, Long] {
 
-  override def s(index: Int): Char = s.charAt(index)
-  override def t(index: Int): Char = t.charAt(index)
+  override def s(index: Int): Char = s.charAt(index - 1)
+  override def t(index: Int): Char = t.charAt(index - 1)
 
   override def `|s|` : Int  = s.size
   override def `|t|` : Int  = t.size
@@ -142,7 +137,7 @@ final class GlobalProcessor[F[_]: Concurrent] private (s: String, t: String)
   override def startAlignment(M: DenseMatrix[Long]): (Int, Int) =
     `|s|` -> `|t|`
 
-  override def continueAlignment(M: DenseMatrix[Long], i: Int, j: Int): Boolean =
+  override def continueAlignment(V: Long, i: Int, j: Int): Boolean =
     i =!= 0 && j =!= 0
 
   override def score(s: Char, t: Char): Long =
@@ -157,13 +152,16 @@ final class GlobalProcessor[F[_]: Concurrent] private (s: String, t: String)
     matrix().map(M => M(`|s|`, `|t|`))
 
   override def prepare(M: DenseMatrix[Long]): F[Unit] =
-    Sync[F].delay {
-      // Values associated with column alignment
-      for (k <- 1 to `|t|`) M(0, k) = k * score(`'-'`, t(k - 1))
-
-      // Values associated with row alignment
-      for (k <- 1 to `|s|`) M(k, 0) = k * score(s(k - 1), `'-'`)
-    }.void
+    for {
+      _ <- Sync[F].delay {
+             for (k <- 1 to `|t|`)
+               M(0, k) = k * score(`'-'`, t(k))
+           }
+      _ <- Sync[F].delay {
+             for (k <- 1 to `|s|`)
+               M(k, 0) = k * score(s(k), `'-'`)
+           }
+    } yield ()
 
   override def choose(a: Long, b: Long, c: Long): Long =
     Set(a, b, c).max
@@ -182,8 +180,8 @@ object SemiGlobalProcessor {
 final class SemiGlobalProcessor[F[_]: Concurrent] private (s: String, t: String)
     extends NeedlemanWunsch[F, String, Char, Long] {
 
-  override def s(index: Int): Char = s.charAt(index)
-  override def t(index: Int): Char = t.charAt(index)
+  override def s(index: Int): Char = s.charAt(index - 1)
+  override def t(index: Int): Char = t.charAt(index - 1)
 
   override def `|s|` : Int  = s.size
   override def `|t|` : Int  = t.size
@@ -192,10 +190,10 @@ final class SemiGlobalProcessor[F[_]: Concurrent] private (s: String, t: String)
   implicit val ordering: Ordering[((Int, Int), Long)] =
     Ordering.by(_._2)
 
-  override def startAlignment(M: DenseMatrix[Long]): (Int, Int) =
-    M.iterator.max._1
+  override def startAlignment(M: DenseMatrix[Long]): (Int, Int)    =
+    M.iterator.filter { case ((i, j), _) => i === `|s|` || j === `|t|` }.max._1
 
-  override def continueAlignment(M: DenseMatrix[Long], i: Int, j: Int): Boolean =
+  override def continueAlignment(V: Long, i: Int, j: Int): Boolean =
     i =!= 0 && j =!= 0
 
   override def score(s: Char, t: Char): Long =
@@ -229,8 +227,8 @@ object LocalProcessor {
 final class LocalProcessor[F[_]: Concurrent] private (s: String, t: String)
     extends NeedlemanWunsch[F, String, Char, Long] {
 
-  override def s(index: Int): Char = s.charAt(index)
-  override def t(index: Int): Char = t.charAt(index)
+  override def s(index: Int): Char = s.charAt(index - 1)
+  override def t(index: Int): Char = t.charAt(index - 1)
 
   override def `|s|` : Int  = s.size
   override def `|t|` : Int  = t.size
@@ -242,8 +240,8 @@ final class LocalProcessor[F[_]: Concurrent] private (s: String, t: String)
   override def startAlignment(M: DenseMatrix[Long]): (Int, Int) =
     M.iterator.max._1
 
-  override def continueAlignment(M: DenseMatrix[Long], i: Int, j: Int): Boolean =
-    M(i, j) =!= 0
+  override def continueAlignment(V: Long, i: Int, j: Int): Boolean =
+    V =!= 0
 
   override def score(s: Char, t: Char): Long =
     (s, t) match {

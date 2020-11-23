@@ -32,7 +32,7 @@ object Dependencies {
   // Types
   val shapeless  = "2.3.3"
   val newtype    = "0.4.4"
-  val refined    = "0.9.17"
+  val refined    = "0.9.18"
   val enumeratum = "1.6.1"
 
   // Logging

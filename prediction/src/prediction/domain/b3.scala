@@ -15,9 +15,7 @@ object b3 {
   /**
     * Defines the base type of the entries that could possibly be found in the B3 file.
     */
-  sealed abstract class Entry extends Product with Serializable {
-    def date: jt.LocalDate
-  }
+  sealed abstract class Entry extends Product with Serializable
 
   /**
     * Header entry type.
@@ -28,9 +26,7 @@ object b3 {
     * @param sourceCode The name of the Stock Market.
     * @param fileGenerationDate The date when this file was generated.
     */
-  final case class Header(fileName: Filename, sourceCode: String, fileGenerationDate: jt.LocalDate) extends Entry {
-    override def date: jt.LocalDate = fileGenerationDate
-  }
+  final case class Header(fileName: Filename, sourceCode: String, fileGenerationDate: jt.LocalDate) extends Entry
 
   /**
     * Register entry type.
@@ -68,9 +64,7 @@ object b3 {
       totNeg: Int,
       quaTot: Int,
       volTot: BigDecimal
-  ) extends Entry {
-    override def date: jt.LocalDate = dateOfExchange
-  }
+  ) extends Entry
 
   /**
     * Trailer entry type.
@@ -87,7 +81,5 @@ object b3 {
       sourceCode: String,
       fileGenerationDate: jt.LocalDate,
       totalRegisters: Long
-  ) extends Entry {
-    override def date: jt.LocalDate = fileGenerationDate
-  }
+  ) extends Entry
 }

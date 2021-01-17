@@ -73,12 +73,18 @@ sealed abstract class NeedlemanWunsch[
     for {
       M    <- deferred.get
       size <- Sync[F].delay(Math.max(`|s|`, `|t|`))
-      `~s` <- Sync[F].delay(DenseVector.zeros[Token](size))
-      `~t` <- Sync[F].delay(DenseVector.zeros[Token](size))
+      `~s` <- Sync[F].delay(DenseVector.zeros[Token](size * 2))
+      `~t` <- Sync[F].delay(DenseVector.zeros[Token](size * 2))
       st   <- Sync[F].delay {
                 // Indexes
-                var (i, j) = startAlignment(M)
+                var (i, j) = `|s|` -> `|t|`
                 var k      = 0
+
+                locally {
+                  val (_i, _j) = startAlignment(M)
+                  for (_ <- _i until `|s|`) up()
+                  for (_ <- _j until `|t|`) left()
+                }
 
                 def diag(): Unit = {
                   `~s`(k) = s(i)
@@ -191,7 +197,7 @@ final class SemiGlobalProcessor[F[_]: Concurrent] private (s: String, t: String)
     Ordering.by(_._2)
 
   override def startAlignment(M: DenseMatrix[Long]): (Int, Int)    =
-    M.iterator.filter { case ((i, j), _) => i === `|s|` || j === `|t|` }.max._1
+    M.iterator.filter { case ((_, j), _) => j === `|t|` }.max._1
 
   override def continueAlignment(V: Long, i: Int, j: Int): Boolean =
     i =!= 0 && j =!= 0
@@ -208,7 +214,10 @@ final class SemiGlobalProcessor[F[_]: Concurrent] private (s: String, t: String)
     matrix().map(M => Math.max(max(M(::, -1)), max(M(-1, ::))))
 
   override def prepare(M: DenseMatrix[Long]): F[Unit] =
-    Applicative[F].unit
+    Sync[F].delay {
+      for (k <- 1 to `|t|`)
+        M(0, k) = k * score(`'-'`, t(k))
+    }
 
   override def choose(a: Long, b: Long, c: Long): Long =
     Set(a, b, c).max

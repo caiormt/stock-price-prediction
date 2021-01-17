@@ -7,24 +7,25 @@ import $ivy.`com.lihaoyi::mill-contrib-bloop:$MILL_VERSION`
 import $ivy.`com.lihaoyi::mill-contrib-scoverage:$MILL_VERSION`
 import mill.contrib.scoverage.ScoverageModule
 
-import $ivy.`com.goyeau::mill-scalafix:0.1.5`
+import $ivy.`com.goyeau::mill-scalafix:0.2.1`
 import com.goyeau.mill.scalafix.StyleModule
 
-import $ivy.`io.github.davidgregory084::mill-tpolecat:0.1.4`
+import $ivy.`io.github.davidgregory084::mill-tpolecat:0.2.0`
 import io.github.davidgregory084.TpolecatModule
 
 object Dependencies {
   // Cats Core
-  val cats       = "2.2.0"
-  val kittens    = "2.2.0"
-  val mouse      = "0.25"
-  val catsEffect = "2.2.0"
+  val cats       = "2.3.0"
+  val kittens    = "2.2.1"
+  val mouse      = "0.26.2"
+  val catsEffect = "2.3.0"
 
   // Streaming
-  val fs2 = "2.4.5"
+  val fs2 = "2.4.6"
 
   // Parser
-  val atto = "0.8.0"
+  val atto     = "0.8.0"
+  val mainargs = "0.1.4"
 
   // Math
   val breeze = "1.1"
@@ -32,7 +33,7 @@ object Dependencies {
   // Types
   val shapeless  = "2.3.3"
   val newtype    = "0.4.4"
-  val refined    = "0.9.18"
+  val refined    = "0.9.19"
   val enumeratum = "1.6.1"
 
   // Logging
@@ -40,20 +41,20 @@ object Dependencies {
   val log4j2   = "2.13.3"
 
   // Compiler Plugins
-  val kindProjector    = "0.11.0"
+  val kindProjector    = "0.11.2"
   val betterMonadicFor = "0.3.1"
-  val scalaTypedHoles  = "0.1.5"
+  val scalaTypedHoles  = "0.1.6"
   val splain           = "0.5.7"
 
   // Scalafix
-  val organizeImports = "0.4.0"
+  val organizeImports = "0.4.4"
 }
 
 object prediction extends CommonModule {
 
   override def artifactName = "prediction"
 
-  override def forkArgs = Seq("-Xmx256M", "-XX:+UseG1GC")
+  override def forkArgs = Seq("-Xmx256M")
 
   override def ivyDeps =
     Agg(
@@ -67,6 +68,7 @@ object prediction extends CommonModule {
       ivy"org.tpolecat::atto-core:${Dependencies.atto}",
       ivy"org.tpolecat::atto-fs2:${Dependencies.atto}",
       ivy"org.tpolecat::atto-refined:${Dependencies.atto}",
+      ivy"com.lihaoyi::mainargs:${Dependencies.mainargs}",
       ivy"org.scalanlp::breeze:${Dependencies.breeze}",
       ivy"org.scalanlp::breeze-natives:${Dependencies.breeze}",
       ivy"org.scalanlp::breeze-viz:${Dependencies.breeze}",
@@ -92,7 +94,7 @@ object prediction extends CommonModule {
 
 trait CommonModule extends ScalaModule with TpolecatModule with CommonStyleModule {
 
-  override def scalaVersion = "2.13.3"
+  override def scalaVersion = "2.13.4"
 
   override def scalacOptions =
     super.scalacOptions() ++

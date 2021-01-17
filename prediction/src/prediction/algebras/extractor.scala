@@ -14,21 +14,17 @@ trait Extractor[F[_], A] {
 }
 
 object B3Extractor {
-  def make[F[_]: Sync]: F[Extractor[F, Entry]] =
+  def make[F[_]: Sync]: F[Extractor[F, Register]] =
     Sync[F].delay(new B3Extractor[F])
 }
 
-final class B3Extractor[F[_]: Sync] extends Extractor[F, Entry] {
-  override def toAlphabet(data: Stream[F, Entry]): F[String] =
-    data
-      .collect { case r: Register => r }
-      .map {
-        case r if r.preAbe < r.preUlt  => Alphabet.P
-        case r if r.preAbe == r.preUlt => Alphabet.Z
-        case r if r.preAbe > r.preUlt  => Alphabet.N
-      }
-      .widen[Alphabet]
-      .map(_.show)
-      .compile
-      .string
+final class B3Extractor[F[_]: Sync] extends Extractor[F, Register] {
+  override def toAlphabet(data: Stream[F, Register]): F[String] =
+    data.map(registerToAlphabet).map(_.show).compile.string
+
+  private val registerToAlphabet: Register => Alphabet = {
+    case r if r.preAbe < r.preUlt => Alphabet.P
+    case r if r.preAbe > r.preUlt => Alphabet.N
+    case _                        => Alphabet.Z
+  }
 }

@@ -1,0 +1,146 @@
+# Next steps
+
+## Comparar gráfico do primeiro semestre de 2020
+Maior Seq -> 2020-01-02 ~ 2020-06-30
+Menor Seq -> 2020-07-01 ~ 2020-07-31
+
+Fazer com os meses de Ago, Set, Out, Nov.
+Ideia é buscar se está correto a predição do próximo dia do mês.
+
+Página 57.
+
+Jul:
+PPNNNNNPPNNPPNPPNNPNPNPNNNNNPPNNPPPNPNNPPNNNNNPNNNNZNPNNPPPNPNPPNPNPNPNPNNPPNNPPPNPNNNPNNNPNPNPPPPNPNPPPPPNPPNPPNPPNNNNPNPN
+------------------------------------------------------------PNPPNPNPNP-P-NPPNNNPPNPPN--------------------------------------
+Previsto N
+Atual    N
+
+Ago:
+PPNNNNNPPNNPPNPPNNPNPNPNNNNNPPNNPPPNPNNPPNNNNNPNNNNZNPNNPPPNPNPPNPNPNPNPNNPPNNPPPNPNNNPNNNPNPNPPP-PNPNPPPPPNPPNPPNPPNNNNPNPNPNPPNPNPNPPNPPNNNPPNPPN
+---------------------------------------------------------------------------------NNNPNPNNNPNPNPPPNNNPN---------------------------------------------
+Previsto P
+Atual    P
+
+Set:
+PPNNNNNPPNNPPNPPNNPNPNPNNNNNPPNNPPPNPNNPPNNNNNPNNNNZNPNNPPPNPNPPNPNP-NPNPNNPPNNPPPNPNNNPNNNPNPNPPPPNPNPPPPPNPPNPPNPPNNNNPNPNPNPPNPNPNPPNPPNNNPPNPPNNNNPNPNNNPNPNPPPNNNPN
+----------------------------------------------------------PNNNPPN-NPNNPNPPNPPNNP----------------------------------------------------------------------------------------
+Previsto P
+Atual    P
+
+Out:
+PPNNNNNPPNNPPNPPNNPNPNPNNNNNPPNNPPPNPNNPPNNNNNPNNNNZNPNNPPPNPNPPNPNPNPNPNNPPNNPPPNPNNNPNNNPNPNPPPPNPNPPPPPNPPNPPNPPNNNNPNPNPNPPNPNPNPPNPPNNNPPNPPNNNNPNPNNNPNPNPPPNNNPNPNNNPPNNPNNPNPPNPPNNP
+--------------------PNPNNPNPPPNNPPPNPNNPN---------------------------------------------------------------------------------------------------------------------------------------------------
+Previsto N
+Atual    P
+
+Nov:
+PPNNNNNPPNNPPNPPNNPNPNPNNNNNPPNNPPPNPNNPPNNNNNPNNNNZNPNNPPPNPNPPNPNPNPNPNNPPNNPPPNPNNNPNNNPNPNPPPPN-PNPPPPPNPPNPPNPPNNNNPNPNPNPPNPNPNPPNPPNNNPPNPPNNNNPNPNNNPNPNPPPNNNPNPNNNPPNNPNNPNPPNPPNNPPNPNNPNPPPNNPPPNPNNPN
+----------------------------------------------------------------------------------------------PPPPNPPNPPPNPNPPPPPN------------------------------------------------------------------------------------------------
+Previsto P
+Atual    P
+
+Sequencia Maior 2019.
+Sequencia menor meses de 2020.
+
+Pegar os dois ultimos anos para a sequencia maior.
+
+
+
+
+
+----------
+
+USANDO 2019:
+
+
+Jan:
+PPPNPPPNPNPPPPNPPNNPNPPPNNPNPNPNNPNNPNPNNNNZPPNPNPPNNNNPPNPNNNNPPPNNNNNPNPPPNPNNPNPPNPNNNNPNPPPNPNPPPPNNNNPPZPNPNPPPPZNNPNNNPPPPPNNNNNPNZNPNNPNNNPNPPPPNPNNNNNPNNNPP-PPNNPPPNNNPNNPPNPPNPPNNNNPPNNPPPPPPNNPPPNPPNPNPPNNPNPNPPNNPPNNPPNPNPPPNNNPNNNPPPPPNN
+-------------------------------------------------------------------------------------------------------------------------------------------------------PPNNNNNPPNNPPNPPNNPNPN----------------------------------------------------------------------------
+Previsto N
+Atual    P
+
+---
+
+Fev:
+PPPNPPPNPNPPPPNPPNNPNPPPNNPNPNPNNPNNPNPNNNNZPPNPNPPNNNNPPNPNNNNPPPNNNNNPNPPPNPNNPNPPNPNNNNPNPPPNPNPPPPNNNNPPZPNPNPPPPZNNPNNNPPPPPNNNNNPNZNPNNPNNNPNPPPPNPNNNNNPNNNPPP-PNNPPPNNNPNNPPNPPNPPNNNNPPNNPPPPPPNNPPPNPPNPNPPNNPNPNPPNNPPNNPPNPNPPPNNNPNNNPPPPPNN
+--------------------------------------------------------------------------------------------------------------------------------------------------------PNNNNNPPNNPPPNPNNP-------------------------------------------------------------------------------
+Previsto P
+Atual    P
+
+---
+
+Mar:
+PPPNPPPNPNPPPPNPPNNPNPPPNNPNPNPNNPNNPNPNNNNZPPNPNPPNNNNPPNPNNNNPPPNNNNNPNPPPNPNNPNPPNPNNNNPNPPPNPNPPPPNNNNPPZPNPNPPPPZNNPNNNPPPPPNNNNNPNZNPNNPNNNPNPPPPNPNNNNNPNNNPPPPNNPPPNNNPNNPPNPPNPPNNNNPPNNPPPPPPNNPPPNPPNPNPPNNPNPNPPNNPPNNPPNPNPPPNNNPNNNPPPPPNN
+--------------------------------------------------------------------------------------------------------------------------------------------------------PNNNNNPNNNNZNPNNPPPNPN--------------------------------------------------------------------------
+Previsto P
+Atual    N
+
+---
+
+Abr:
+PPPNPPPNPNPPPPNPPNNPNPPPNNPNPNPNNPNNPNPNNNNZPPNPNPPNNNNPPNPNNNNPPPNNNNNPNPPPNPNNPNPPNPNNNNPNPPPNPNPPPPNNNNPPZPNPNPPPPZNNPNNNPPPPPNNNNNPNZNPNNPNNNPNPPPPNPNNNNNPNNNPPPPNNPPPNNNPNNPPNPPNPPNNNNPPNNPPPPPPNNPPPNPPNPNPPNNPNPNP-PNNPPNNPPNPNPPPNNNPNNNPPPPPNN
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------PPNPNPNPNPNNPPNNPP-PN-----------------
+Previsto P
+Atual    N
+
+---
+
+Mai:
+PPPNPPPNPNPPPPNPPNNPNPPPNNPNPNPNNPNNPNPNNNNZPPNPNPPNNNNPPNPNNNNPPPNNNNNPNPPPNPNNPNPPNPNNNNPNPPPNPNPPPPNNNNPPZPNPNPPPPZNNPNNNPPPPPNNNNNPNZNPNNPNNNPNPPPPNPNNNNNPNNNPPPPNNPPPNNNPNNPPNPPNPPNNNNPPNNPPPPPPNNPPPNPPNPNPPNNPNPNPPNNPPNNPPNPNPPPNNNPNNNPPPPPNN
+--------------------------------------------------------------------------------------------------------------------------------------PNNNPNN-NPNPNPPPPNPNP---------------------------------------------------------------------------------------------
+Previsto N
+Atual    P
+
+---
+
+Jun:
+PPPNPPPNPNPPPPNPPNNPNPPPNNPNPNPNNPNNPNPNNNNZPPNPNPPNNNNPPNPNNNNPPPNNNNNPNPPPNPNNPNPPNPNNNNPNPPPNPNPPPPNNNNPPZPNPNPPPPZNNPNNNPPPPPNNNNNPNZNPNNPNNNPNPPPPNPNNNNNPNNNPPPPNNPPPNNNPNNPPNPPNPPNNNNPPNNPPPPPPNNPPPNPPNPNPPNNPNPNPPNNPPNNPPNPNPPPNNNPNNNPPPPPNN
+----------PPPPNPPNPPN-PPNNNNPNPN------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Previsto N
+Atual    P
+
+---
+
+Jul:
+PPPNPPPNPNPPPPNPPNNPNPPPNNPNPNPNNPNNPNPNNNNZPPNPNPPNNNNPPNPNNNNPPPNNNNNPNPPPNPNNPNPPNPNNNNPNPPPNPNPPPPNNNNPPZPNPNPPPPZNNPNNNPPPPPNNNNNPNZNPNNPNNNPNPPPPNPNNNNNPNNNPPPPNNPPPNNNPNNPPNPPNPPNNNNPPNNPPPPPPNNPPPNPPNPNPPNNPNPNPPNNPPNNPPN-PNPPPNNNPNNNPPPPPNN
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------PNPP-NPNPNPPNPPNNNPPNPPN-----------------
+Previsto P
+Atual    N
+
+---
+
+Ago:
+PPPNPPPNPNPPPPNPPNNPNPPPNNPNPNPNNPNNPNPNNNNZPPNPNPPNNNNPPNPNNNNPPPNNNNNPNPPPNPNNPNPPNPNNNNPNPPPNPNPPPPNNNNPPZPNPNPPPPZNNPNNNPPPPPNNNNNPNZNPNNPNNNPNPPPPNPNNNNNPNNNPPPPNNPPPNNNPNNPPNPPNPPNNNNPPNNPPPPPPNNPPPNPPNPNPPNNPNPNPPNNPPNNPPNPNPPPNNNPNNNPPPPPNN
+------------------------------------------------------------NNNPNPNNNPNPNPPPN-NNPN----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Previsto P
+Atual    P
+
+---
+
+Set:
+PPPNPPPNPNPPPPNPPNNPNPPPNNPNPNPNNPNNPNPNNNNZPPNPNPPNNNNPPNPNNNNPPPNNNNNPNPPPNPNNPNPPNPNNNNPNPPPNPNPPPPNNNNPPZPNPNPPPPZNNPNNNPPPPPNNNNNPNZNPNNPNNNPNPPPPNPNNNNNPNNNPPPPNNPPPNNNPNNPPNPPNPPNNNNPPNNPPPPPPNNPPPNPPNPNPPNNP-NPNPPNNPPNNPPNPNPPPNNNPNNNPPPPPNN
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------PNNNPPNNPNNPNPP-NPPNNP---------------------
+Previsto P
+Atual    P
+
+---
+
+Out:
+PPPNPPPNPNPPPPNPPNNPNPPPNNPNPNPNNPNNPNPNNNNZPPNPNPPNNNNPPNPNNNNPPPNNNNNPNPPPNPNNPNPPNPNNNNPNPPPNPNPPPPNNNNPPZPNPNPPPPZNNPNNNPPPPPNNNNNPNZNPNNPNNNPNPPPPNPNNNNNPNNNPPPPNNPPPNNNPNNPPNPPNPPNNNNPPNNPPPPPPNNPPPNPPNPNPPNNPNPNPPNNPPNNPPNPNPPPNNNPNNNPPPPPNN
+-------------PN-PNNPNPPPNNPPPNPNNPN---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Previsto N
+Atual    P
+
+---
+
+Nov:
+PPPNPPPNPNPPPPNPPNNPNPPPNNPNPNPNNPNNPNPNNNNZPPNPNPPNNNNPPNPNNNNPPPNNNNNPNPPPNPNNPNPPNPNNNNPNPPPNPNPPPPNNNNPPZPNPNPPPPZNNPNNNPPPPPNNNNNPNZNPNNPNNNPNPPPPNPNNNNNPNNNPPPPNNPPPNNNPNNPPNPPNPPNNNNPPNNPPPPPPNNPPPNPPNPNPPNNPNPNPPNNPPNNPPNPNPPPNNNPNNNPPPPPNN
+--------------------------------------------------------------------------------------------------PPPPNPPNPP-PNPNPPPPPN---------------------------------------------------------------------------------------------------------------------------------
+Previsto N
+Atual    P
+
+---
+
+Total  : 11
+Acertos: 3
+Erros  : 8

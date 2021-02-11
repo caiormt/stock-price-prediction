@@ -1,16 +1,8 @@
-package prediction.domain
-
-import eu.timepit.refined._
-import eu.timepit.refined.api._
-import eu.timepit.refined.string._
-
-import io.estatico.newtype.macros._
+package prediction.data.models
 
 import java.{ time => jt }
 
 object b3 {
-  type FileName = MatchesRegex[W.`"COTAHIST.[0-9]{4}"`.T]
-  @newtype case class Filename(value: String Refined FileName)
 
   /**
     * Defines the base type of the entries that could possibly be found in the B3 file.
@@ -26,7 +18,11 @@ object b3 {
     * @param sourceCode The name of the Stock Market.
     * @param fileGenerationDate The date when this file was generated.
     */
-  final case class Header(fileName: Filename, sourceCode: String, fileGenerationDate: jt.LocalDate) extends Entry
+  final case class Header(
+      fileName: String,
+      sourceCode: String,
+      fileGenerationDate: jt.LocalDate
+  ) extends Entry
 
   /**
     * Register entry type.
@@ -77,7 +73,7 @@ object b3 {
     * @param totalRegisters The number of records before this item.
     */
   final case class Trailer(
-      fileName: Filename,
+      fileName: String,
       sourceCode: String,
       fileGenerationDate: jt.LocalDate,
       totalRegisters: Long

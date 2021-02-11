@@ -3,7 +3,10 @@ Stock Price Prediction Project
 
 ## Description
 
-This project aims to predict future stock values using Sequence Alignment, translating historic values from [Ibovespa][b3-history] (or from other markets) into an known alphabet.
+This project aims to predict future stock values using Sequence Alignment, translating historic values from markets into a known alphabet.
+
+Current markets implemented:
+- [Ibovespa][b3-history]
 
 ## Setup
 
@@ -30,10 +33,10 @@ $ mill mill.scalalib.GenIdea/idea
 
 And import the project as usual.
 
-## Extract known paper using grep
+### Check dependecy upgrade
 
 ```shell script
-$ grep '<codNeg>' COTAHIST_AYYYY.TXT > <codNeg>.TXT
+$ mill mill.scalalib.Dependency/showUpdates
 ```
 
 ## LICENSE

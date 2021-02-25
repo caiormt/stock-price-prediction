@@ -14,19 +14,19 @@ import $ivy.`io.github.davidgregory084::mill-tpolecat:0.2.0`
 import io.github.davidgregory084.TpolecatModule
 
 object Dependencies {
-  val cats           = "2.3.1"
-  val catsEffect     = "2.3.1"
+  val cats           = "2.4.2"
+  val catsEffect     = "2.3.3"
   val catsTime       = "0.3.4"
   val catsEffectTime = "0.1.2"
   val console4cats   = "0.8.1"
   val fuuid          = "0.5.0"
   val kittens        = "2.2.1"
-  val fs2            = "2.5.0"
+  val fs2            = "2.5.3"
   val newtype        = "0.4.4"
-  val refined        = "0.9.20"
+  val refined        = "0.9.21"
   val enumeratum     = "1.6.1"
   val breeze         = "1.1"
-  val atto           = "0.9.1"
+  val atto           = "0.9.2"
 
   // Testing
   val weaver = "0.6.0-M6"

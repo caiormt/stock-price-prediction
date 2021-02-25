@@ -1,0 +1,54 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Scala
+        uses: olafurpg/setup-scala@v10
+        with:
+          java-version: graalvm@
+
+      - name: Cache Coursier dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/coursier
+          key: ${{ runner.os }}-${{ github.ref }}-coursier
+          restore-keys: |
+            ${{ runner.os }}-${{ github.ref }}-coursier
+
+      - name: Cache Ivy dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.ivy2/cache
+          key: ${{ runner.os }}-${{ github.ref }}-ivy2
+          restore-keys: |
+            ${{ runner.os }}-${{ github.ref }}-ivy2
+
+      - name: Set up Mill
+        uses: jodersky/setup-mill@v0.2.3
+        with:
+          mill-version: 0.9.5
+
+      - name: Check Style
+        run: mill --no-server all __.checkStyle
+
+      - name: Run tests
+        run: mill --no-server prediction.test
+      # - name: Create tests report
+      #   run: mill --no-server qfa.scoverage.xmlReport
+      # - name: Codecov Report
+      #   uses: codecov/codecov-action@v1.0.7
+      #   with:
+      #     token: ${{ secrets.CODECOV_TOKEN }}
+      #     fail_ci_if_error: true

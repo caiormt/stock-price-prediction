@@ -1,4 +1,4 @@
-package prediction.data.usecases
+package prediction.data.usecases.b3
 
 import cats._
 import cats.implicits._
@@ -10,7 +10,7 @@ import prediction.domain.entities.algorithm._
 import prediction.domain.usecases._
 
 object B3ScoreCalculator {
-  def make[F[_]: Sync]: F[ScoreCalculator[F]] =
+  def make[F[_]: Sync]: F[B3ScoreCalculator[F]] =
     Sync[F].delay(new B3ScoreCalculator[F])
 }
 

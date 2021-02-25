@@ -5,18 +5,17 @@ import cats.implicits._
 
 import cats.effect._
 
-import prediction.data.ports._
+import prediction.data.ports.services._
 import prediction.domain.entities.algorithm._
 
 import breeze.linalg.{ max => bmax, _ }
 
 object BreezeMatrixService {
-  def make[F[_]: Sync]: F[MatrixService[F, DenseMatrix]] =
+  def make[F[_]: Sync]: F[BreezeMatrixService[F]] =
     Sync[F].delay(new BreezeMatrixService[F])
 }
 
 final class BreezeMatrixService[F[_]: Sync] private () extends MatrixService[F, DenseMatrix] {
-
   override def empty(n: Int, m: Int): F[DenseMatrix[AlgorithmScore]] =
     Sync[F].delay(DenseMatrix.zeros[AlgorithmScore](n, m))
 

@@ -11,7 +11,7 @@ import prediction.domain.entities.quotation._
 import prediction.domain.usecases._
 
 object B3AlgorithmParser {
-  def make[F[_]: Sync]: F[AlgorithmParser[F]] =
+  def make[F[_]: Sync]: F[B3AlgorithmParser[F]] =
     Sync[F].delay(new B3AlgorithmParser[F])
 }
 

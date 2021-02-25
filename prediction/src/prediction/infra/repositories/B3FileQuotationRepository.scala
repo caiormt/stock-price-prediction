@@ -8,7 +8,7 @@ import fs2._
 
 import prediction.data.models.b3._
 import prediction.data.parsers.b3._
-import prediction.data.ports._
+import prediction.data.ports.repositories._
 import prediction.domain.entities.quotation._
 
 import java.nio.file._

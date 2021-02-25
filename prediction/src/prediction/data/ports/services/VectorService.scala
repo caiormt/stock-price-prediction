@@ -1,4 +1,4 @@
-package prediction.data.ports
+package prediction.data.ports.services
 
 import prediction.domain.entities.algorithm._
 

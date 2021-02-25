@@ -1,4 +1,5 @@
 package prediction.data.usecases
+package b3
 
 import cats.implicits._
 
@@ -11,7 +12,6 @@ import prediction.domain.entities._
 import prediction.domain.entities.algorithm._
 
 object B3AlgorithmParserSpec extends SimpleIOSuite with Checkers {
-
   test("Equal opening and closing price") {
     forall(equalQuotationGen) { quotation =>
       for {

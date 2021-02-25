@@ -1,4 +1,5 @@
 package prediction.data.usecases
+package b3
 
 import cats.implicits._
 
@@ -13,7 +14,7 @@ import prediction.domain.entities.algorithm._
 object B3ScoreCalculatorSpec extends SimpleIOSuite with Checkers {
 
   override def checkConfig: CheckConfig =
-    CheckConfig.default.copy(maximumDiscardRatio = 80)
+    CheckConfig.default.copy(maximumDiscardRatio = 100)
 
   test("Both tokens empty") {
     for {
@@ -23,7 +24,7 @@ object B3ScoreCalculatorSpec extends SimpleIOSuite with Checkers {
   }
 
   test("Left token empty") {
-    forall(nonEmptyAlphabetGen) { alphabet: Alphabet =>
+    forall(nonEmptyAlphabetGen) { alphabet =>
       for {
         calculator <- B3ScoreCalculator.make[IO]
         score      <- calculator.calculate(AlgorithmToken(Alphabet.Empty), AlgorithmToken(alphabet))
@@ -32,7 +33,7 @@ object B3ScoreCalculatorSpec extends SimpleIOSuite with Checkers {
   }
 
   test("Right token empty") {
-    forall(nonEmptyAlphabetGen) { alphabet: Alphabet =>
+    forall(nonEmptyAlphabetGen) { alphabet =>
       for {
         calculator <- B3ScoreCalculator.make[IO]
         score      <- calculator.calculate(AlgorithmToken(alphabet), AlgorithmToken(Alphabet.Empty))
@@ -41,7 +42,7 @@ object B3ScoreCalculatorSpec extends SimpleIOSuite with Checkers {
   }
 
   test("Both tokens non empty equal") {
-    forall(nonEmptyAlphabetGen) { alphabet: Alphabet =>
+    forall(nonEmptyAlphabetGen) { alphabet =>
       for {
         calculator <- B3ScoreCalculator.make[IO]
         score      <- calculator.calculate(AlgorithmToken(alphabet), AlgorithmToken(alphabet))
@@ -50,7 +51,7 @@ object B3ScoreCalculatorSpec extends SimpleIOSuite with Checkers {
   }
 
   test("Both tokens non empty non equal") {
-    forall(nonEmptyTupledAlphabetGen) {
+    forall(nonEmptyTupledDistinctAlphabetGen) {
       case (alphabet1, alphabet2) =>
         for {
           calculator <- B3ScoreCalculator.make[IO]

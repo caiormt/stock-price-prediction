@@ -1,4 +1,4 @@
-package prediction.data.ports
+package prediction.data.ports.repositories
 
 import prediction.domain.entities.quotation._
 

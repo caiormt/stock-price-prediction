@@ -5,12 +5,12 @@ import cats.implicits._
 
 import cats.effect._
 
-import prediction.data.ports._
+import prediction.data.ports.services._
 import prediction.domain.entities.algorithm._
 import prediction.domain.usecases._
 
 object SemiGlobalSimilarityCalculator {
-  def make[F[_]: Sync: Parallel, M[_]](matrix: MatrixService[F, M]): F[SimilarityCalculator[F, M]] =
+  def make[F[_]: Sync: Parallel, M[_]](matrix: MatrixService[F, M]): F[SemiGlobalSimilarityCalculator[F, M]] =
     Sync[F].delay(new SemiGlobalSimilarityCalculator[F, M](matrix))
 }
 

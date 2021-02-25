@@ -21,6 +21,7 @@ object algorithm {
 
     implicit final class AlgorithmSequenceOps(private val sequence: AlgorithmSequence) extends AnyVal {
       def apply(index: Int): AlgorithmToken = sequence.value(index - 1)
+      def size: Int                         = sequence.value.size
     }
   }
 

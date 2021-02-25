@@ -7,6 +7,7 @@ import cats.effect.Console.implicits._
 import cats.effect._
 
 import prediction.data.usecases._
+import prediction.data.usecases.b3._
 import prediction.domain.entities.algorithm._
 import prediction.domain.usecases._
 import prediction.infra.services._

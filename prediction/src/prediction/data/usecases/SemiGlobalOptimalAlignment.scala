@@ -48,11 +48,7 @@ final class SemiGlobalOptimalAlignment[F[_]: Sync: Parallel, M[_], V[_]] private
   import SemiGlobalOptimalAlignment._
   import ConsumingDirection._
 
-  override def align(
-      first: AlgorithmSequence,
-      second: AlgorithmSequence,
-      M: M[AlgorithmScore]
-  ): F[AlgorithmAlignment] =
+  override def align(first: AlgorithmSequence, second: AlgorithmSequence, M: M[AlgorithmScore]): F[AlgorithmAlignment] =
     Sync[F].uncancelable {
       for {
         size      <- Sync[F].delay(first.size * second.size)
@@ -150,7 +146,8 @@ final class SemiGlobalOptimalAlignment[F[_]: Sync: Parallel, M[_], V[_]] private
       }
 
       (i, j) match {
-        case (0, 0) => Sync[F].delay(step)
+        case (0, _) => Sync[F].delay(step)
+        case (_, 0) => Sync[F].delay(step)
         case _      => calculate
       }
     }

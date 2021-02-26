@@ -45,10 +45,12 @@ jobs:
 
       - name: Run tests
         run: mill --no-server prediction.test
-      # - name: Create tests report
-      #   run: mill --no-server qfa.scoverage.xmlReport
-      # - name: Codecov Report
-      #   uses: codecov/codecov-action@v1.0.7
-      #   with:
-      #     token: ${{ secrets.CODECOV_TOKEN }}
-      #     fail_ci_if_error: true
+
+      - name: Create tests report
+        run: mill --no-server prediction.scoverage.xmlReport
+
+      - name: Codecov Report
+        uses: codecov/codecov-action@v1.2.1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: tru

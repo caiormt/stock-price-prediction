@@ -227,11 +227,52 @@ object SemiGlobalOptimalAlignmentSpec extends SimpleIOSuite with Checkers {
 
   // -----
 
-  // test("ALGORITHM") {}
-
-  // -----
-
-  // test("Consuming remaining tokens") {}
+  test("Choose the path that generated the current value") {
+    for {
+      alignment <- optimalAlignment
+      first     <- IO(
+                     AlgorithmSequence(
+                       Vector(
+                         AlgorithmToken(Alphabet.Positive),
+                         AlgorithmToken(Alphabet.Positive),
+                         AlgorithmToken(Alphabet.Positive),
+                         AlgorithmToken(Alphabet.Negative)
+                       )
+                     )
+                   )
+      second    <- IO(
+                     AlgorithmSequence(
+                       Vector(
+                         AlgorithmToken(Alphabet.Positive),
+                         AlgorithmToken(Alphabet.Draw),
+                         AlgorithmToken(Alphabet.Negative)
+                       )
+                     )
+                   )
+      S         <- vector(12)
+      T         <- vector(12)
+      M         <- denseMatrix(
+                     (0L, -2L, -4L, -6L),
+                     (0L, +2L, +0L, -2L),
+                     (0L, +2L, +3L, +1L),
+                     (0L, +2L, +3L, +4L),
+                     (0L, +1L, +3L, +5L)
+                   )
+      step      <- alignment.calculateBestAlignment(first, second)(S, T, M)(new Step(4, 3, 0))
+      // format: off
+    } yield expect(step.i === 1) and expect(step.j === 0) and expect(step.k === 3) and
+            // -- Verify first sequence consumed
+            expect(S(0) === AlgorithmToken(Alphabet.Negative)) and
+            expect(S(1) === AlgorithmToken(Alphabet.Positive)) and
+            expect(S(2) === AlgorithmToken(Alphabet.Positive)) and
+            expect(S(3) === AlgorithmToken.Empty) and
+            // -- Verify second sequence consumed
+            expect(T(0) === AlgorithmToken(Alphabet.Negative)) and
+            expect(T(1) === AlgorithmToken(Alphabet.Draw))     and
+            expect(T(2) === AlgorithmToken(Alphabet.Positive)) and
+            expect(T(3) === AlgorithmToken.Empty)
+      // format: on
+  }
 
   // -----
 

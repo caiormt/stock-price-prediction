@@ -41,9 +41,11 @@ object Dependencies {
   val organizeImports = "0.4.4"
 }
 
-object prediction extends ScalaModule with TpolecatModule with StyleModule {
+object prediction extends ScalaModule with TpolecatModule with StyleModule with ScoverageModule {
 
   override def scalaVersion = "2.13.4"
+
+  override def scoverageVersion = "1.4.2"
 
   override def artifactName = "prediction"
 
@@ -95,7 +97,8 @@ object prediction extends ScalaModule with TpolecatModule with StyleModule {
       ivy"com.github.liancheng::organize-imports:${Dependencies.organizeImports}"
     )
 
-  object test extends Tests with StyleModule {
+  object test extends ScoverageTests with StyleModule {
+
     override def ivyDeps =
       Agg(
         ivy"com.disneystreaming::weaver-cats:${Dependencies.weaver}",

@@ -16,8 +16,8 @@ final class BreezeVectorService[F[_]: Sync] private () extends VectorService[F, 
   override def empty(n: Int): F[DenseVector[AlgorithmToken]] =
     Sync[F].delay(DenseVector.zeros[AlgorithmToken](n))
 
-  override def set(vector: DenseVector[AlgorithmToken], n: Int, value: AlgorithmToken): F[Unit] =
-    Sync[F].delay(vector(n) = value)
+  override def set(vector: DenseVector[AlgorithmToken], n: SequenceIndex, value: AlgorithmToken): F[Unit] =
+    Sync[F].delay(vector(n.value) = value)
 
   override def toVector(vector: DenseVector[AlgorithmToken]): F[scala.Vector[AlgorithmToken]] =
     Sync[F].delay(vector.toScalaVector())

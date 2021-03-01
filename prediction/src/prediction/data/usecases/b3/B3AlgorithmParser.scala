@@ -31,7 +31,4 @@ final class B3AlgorithmParser[F[_]: cats.ApplicativeThrow] extends AlgorithmPars
       .pure(decideAlphabet(quotation))
       .map(AlgorithmToken.apply)
   }
-
-  override def parseChar(char: Char): F[AlgorithmToken] =
-    Alphabet.withValueEither(char).map(AlgorithmToken.apply).liftTo[F]
 }

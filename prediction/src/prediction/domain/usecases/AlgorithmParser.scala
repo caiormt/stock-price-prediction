@@ -9,5 +9,4 @@ object AlgorithmParser {
 
 trait AlgorithmParser[F[_]] {
   def parseQuotation(quotation: Quotation): F[AlgorithmToken]
-  def parseChar(char: Char): F[AlgorithmToken]
 }

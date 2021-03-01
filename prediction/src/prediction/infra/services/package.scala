@@ -6,6 +6,7 @@ import cats.implicits._
 import io.estatico.newtype._
 
 import prediction.domain.entities.algorithm._
+import prediction.domain.usecases._
 
 import breeze.generic._
 import breeze.linalg._
@@ -14,6 +15,11 @@ import breeze.storage._
 import scala.reflect._
 
 package object services {
+
+  type BreezeOptimalAlignment[F[_]] = OptimalAlignment[F, DenseMatrix]
+
+  // -----
+
   implicit def coercibleClassTag[A: Coercible[B, *], B: ClassTag]: ClassTag[A] =
     implicitly[ClassTag[B]].asInstanceOf[ClassTag[A]]
 

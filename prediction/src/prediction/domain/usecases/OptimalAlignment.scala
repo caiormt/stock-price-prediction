@@ -9,4 +9,5 @@ object OptimalAlignment {
 trait OptimalAlignment[F[_], M[_]] {
   def align(first: AlgorithmSequence, second: AlgorithmSequence, M: M[AlgorithmScore]): F[AlgorithmAlignment]
   def buildMatrix(first: AlgorithmSequence, second: AlgorithmSequence): F[M[AlgorithmScore]]
+  def coordinatesMaxValue(M: M[AlgorithmScore]): F[(RowIndex, ColumnIndex)]
 }

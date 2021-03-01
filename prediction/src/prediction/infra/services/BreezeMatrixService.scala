@@ -19,11 +19,11 @@ final class BreezeMatrixService[F[_]: Sync] private () extends MatrixService[F, 
   override def empty(n: Int, m: Int): F[DenseMatrix[AlgorithmScore]] =
     Sync[F].delay(DenseMatrix.zeros[AlgorithmScore](n, m))
 
-  override def get(matrix: DenseMatrix[AlgorithmScore], i: Int, j: Int): F[AlgorithmScore] =
-    Sync[F].delay(matrix(i, j))
+  override def get(matrix: DenseMatrix[AlgorithmScore], i: RowIndex, j: ColumnIndex): F[AlgorithmScore] =
+    Sync[F].delay(matrix(i.value, j.value))
 
-  override def set(matrix: DenseMatrix[AlgorithmScore], i: Int, j: Int, value: AlgorithmScore): F[Unit] =
-    Sync[F].delay(matrix(i, j) = value)
+  override def set(matrix: DenseMatrix[AlgorithmScore], i: RowIndex, j: ColumnIndex, value: AlgorithmScore): F[Unit] =
+    Sync[F].delay(matrix(i.value, j.value) = value)
 
   override def rows(matrix: DenseMatrix[AlgorithmScore]): F[Int] =
     Sync[F].delay(matrix.rows)
@@ -31,9 +31,9 @@ final class BreezeMatrixService[F[_]: Sync] private () extends MatrixService[F, 
   override def cols(matrix: DenseMatrix[AlgorithmScore]): F[Int] =
     Sync[F].delay(matrix.cols)
 
-  override def max(matrix: DenseMatrix[AlgorithmScore], i: Int, j: Int): F[AlgorithmScore] =
-    Sync[F].delay(NonEmptySet.of(bmax(matrix(i, ::)), bmax(matrix(::, j))).maximum)
+  override def max(matrix: DenseMatrix[AlgorithmScore], i: RowIndex, j: ColumnIndex): F[AlgorithmScore] =
+    Sync[F].delay(NonEmptySet.of(bmax(matrix(i.value, ::)), bmax(matrix(::, j.value))).maximum)
 
-  override def coordinatesMaxColumn(matrix: DenseMatrix[AlgorithmScore], j: Int): F[(Int, Int)] =
-    Sync[F].delay(matrix(::, j).iterator.maxBy(_._2)._1).tupleRight(j)
+  override def coordinatesMaxColumn(matrix: DenseMatrix[AlgorithmScore], j: ColumnIndex): F[(RowIndex, ColumnIndex)] =
+    Sync[F].delay(matrix(::, j.value).iterator.maxBy(_._2)._1).map(RowIndex.apply).tupleRight(j)
 }

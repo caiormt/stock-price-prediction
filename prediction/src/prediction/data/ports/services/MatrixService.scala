@@ -26,7 +26,7 @@ trait MatrixService[F[_], C[_]] {
     * @param j Column index
     * @return Score
     */
-  def get(matrix: C[AlgorithmScore], i: Int, j: Int): F[AlgorithmScore]
+  def get(matrix: C[AlgorithmScore], i: RowIndex, j: ColumnIndex): F[AlgorithmScore]
 
   /**
     * Places the value in the position (i, j).
@@ -36,7 +36,7 @@ trait MatrixService[F[_], C[_]] {
     * @param j Column index
     * @param value Score
     */
-  def set(matrix: C[AlgorithmScore], i: Int, j: Int, value: AlgorithmScore): F[Unit]
+  def set(matrix: C[AlgorithmScore], i: RowIndex, j: ColumnIndex, value: AlgorithmScore): F[Unit]
 
   /**
     * Returns the number of rows of the matrix.
@@ -62,7 +62,7 @@ trait MatrixService[F[_], C[_]] {
     * @param j Column index
     * @return The maximum value found
     */
-  def max(matrix: C[AlgorithmScore], i: Int, j: Int): F[AlgorithmScore]
+  def max(matrix: C[AlgorithmScore], i: RowIndex, j: ColumnIndex): F[AlgorithmScore]
 
   /**
     * Returns the coordinates where the score is maximum.
@@ -70,5 +70,5 @@ trait MatrixService[F[_], C[_]] {
     * @param matrix Matrix where coordinates are retrieved from
     * @return The coordinates from maximum value
     */
-  def coordinatesMaxColumn(matrix: C[AlgorithmScore], j: Int): F[(Int, Int)]
+  def coordinatesMaxColumn(matrix: C[AlgorithmScore], j: ColumnIndex): F[(RowIndex, ColumnIndex)]
 }

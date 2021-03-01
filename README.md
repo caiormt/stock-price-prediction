@@ -1,6 +1,9 @@
 Stock Price Prediction Project
 =============
 
+![CI Status](https://github.com/caiormt/stock-price-prediction/workflows/ci/badge.svg)
+[![codecov](https://codecov.io/gh/caiormt/stock-price-prediction/branch/main/graph/badge.svg?token=MP7ATEUP57)](https://codecov.io/gh/caiormt/stock-price-prediction)
+
 ## Description
 
 This project aims to predict future stock values using Sequence Alignment, translating historic values from markets into a known alphabet.

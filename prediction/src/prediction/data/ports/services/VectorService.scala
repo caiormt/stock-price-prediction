@@ -22,7 +22,7 @@ trait VectorService[F[_], C[_]] {
     * @param n Cell index
     * @param value Score
     */
-  def set(vector: C[AlgorithmToken], n: Int, value: AlgorithmToken): F[Unit]
+  def set(vector: C[AlgorithmToken], n: SequenceIndex, value: AlgorithmToken): F[Unit]
 
   /**
     * Transforms the current collection into Scala's Vector.

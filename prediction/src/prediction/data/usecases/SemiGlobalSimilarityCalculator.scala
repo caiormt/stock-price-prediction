@@ -19,6 +19,6 @@ final class SemiGlobalSimilarityCalculator[F[_]: FlatMap: Parallel, M[_]] privat
 
   override def calculate(M: M[AlgorithmScore]): F[AlgorithmScore] =
     (matrix.rows(M), matrix.cols(M)).parMapN {
-      case (rows, cols) => matrix.max(M, rows - 1, cols - 1)
+      case (rows, cols) => matrix.max(M, RowIndex(rows - 1), ColumnIndex(cols - 1))
     }.flatten
 }

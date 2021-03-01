@@ -16,9 +16,6 @@ import prediction.infra.services._
 import breeze.linalg.{ DenseMatrix, DenseVector }
 
 object SemiGlobalOptimalAlignmentSpec extends SimpleIOSuite with Checkers {
-
-  import SemiGlobalOptimalAlignment._
-
   test("Building matrix must initialize first row dirty to penalize") {
     for {
       alignment <- optimalAlignment
@@ -138,7 +135,7 @@ object SemiGlobalOptimalAlignmentSpec extends SimpleIOSuite with Checkers {
       V         <- IO(AlgorithmSequence(Vector.fill(5)(AlgorithmToken(Alphabet.Positive))))
       S         <- vector(5)
       T         <- vector(5)
-      step      <- alignment.consume(V, V)(S, T)(new Step(5, 5, 0), ConsumingDirection.Up)
+      step      <- alignment.consume(V, V)(S, T)(new Step(5, 5, 0), Direction.Up)
     } yield expect(step.i === 4) and expect(step.j === 5) and expect(step.k === 1) and
       expect(S(0) === AlgorithmToken(Alphabet.Positive)) and expect(T(0) === AlgorithmToken.Empty)
   }
@@ -149,7 +146,7 @@ object SemiGlobalOptimalAlignmentSpec extends SimpleIOSuite with Checkers {
       V         <- IO(AlgorithmSequence(Vector.fill(5)(AlgorithmToken(Alphabet.Positive))))
       S         <- vector(5)
       T         <- vector(5)
-      step      <- alignment.consume(V, V)(S, T)(new Step(5, 5, 0), ConsumingDirection.UpLeft)
+      step      <- alignment.consume(V, V)(S, T)(new Step(5, 5, 0), Direction.UpLeft)
     } yield expect(step.i === 4) and expect(step.j === 4) and expect(step.k === 1) and
       expect(S(0) === AlgorithmToken(Alphabet.Positive)) and expect(T(0) === AlgorithmToken(Alphabet.Positive))
   }
@@ -160,7 +157,7 @@ object SemiGlobalOptimalAlignmentSpec extends SimpleIOSuite with Checkers {
       V         <- IO(AlgorithmSequence(Vector.fill(5)(AlgorithmToken(Alphabet.Positive))))
       S         <- vector(5)
       T         <- vector(5)
-      step      <- alignment.consume(V, V)(S, T)(new Step(5, 5, 0), ConsumingDirection.Left)
+      step      <- alignment.consume(V, V)(S, T)(new Step(5, 5, 0), Direction.Left)
     } yield expect(step.i === 5) and expect(step.j === 4) and expect(step.k === 1) and
       expect(S(0) === AlgorithmToken.Empty) and expect(T(0) === AlgorithmToken(Alphabet.Positive))
   }
@@ -289,6 +286,10 @@ object SemiGlobalOptimalAlignmentSpec extends SimpleIOSuite with Checkers {
   }
 
   // -----
+
+  implicit private def intToRowIndex(value: Int): RowIndex           = RowIndex(value)
+  implicit private def intToColumnIndex(value: Int): ColumnIndex     = ColumnIndex(value)
+  implicit private def intToSequenceIndex(value: Int): SequenceIndex = SequenceIndex(value)
 
   private object MockCalculator extends ScoreCalculator[IO] {
     import Alphabet._

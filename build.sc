@@ -14,87 +14,66 @@ import $ivy.`io.github.davidgregory084::mill-tpolecat:0.2.0`
 import io.github.davidgregory084.TpolecatModule
 
 object Dependencies {
-  // Cats Core
-  val cats       = "2.3.0"
-  val kittens    = "2.2.1"
-  val mouse      = "0.26.2"
-  val catsEffect = "2.3.0"
+  val cats           = "2.4.2"
+  val catsEffect     = "2.3.3"
+  val catsTime       = "0.3.4"
+  val catsEffectTime = "0.1.2"
+  val console4cats   = "0.8.1"
+  val fuuid          = "0.5.0"
+  val kittens        = "2.2.1"
+  val fs2            = "2.5.3"
+  val newtype        = "0.4.4"
+  val refined        = "0.9.21"
+  val enumeratum     = "1.6.1"
+  val breeze         = "1.1"
+  val atto           = "0.9.2"
 
-  // Streaming
-  val fs2 = "2.4.6"
-
-  // Parser
-  val atto     = "0.8.0"
-  val mainargs = "0.1.4"
-
-  // Math
-  val breeze = "1.1"
-
-  // Types
-  val shapeless  = "2.3.3"
-  val newtype    = "0.4.4"
-  val refined    = "0.9.19"
-  val enumeratum = "1.6.1"
-
-  // Logging
-  val log4cats = "1.1.1"
-  val log4j2   = "2.13.3"
+  // Testing
+  val weaver = "0.6.0-M6"
 
   // Compiler Plugins
-  val kindProjector    = "0.11.2"
+  val kindProjector    = "0.11.3"
   val betterMonadicFor = "0.3.1"
-  val scalaTypedHoles  = "0.1.6"
+  val scalaTypedHoles  = "0.1.7"
   val splain           = "0.5.7"
 
   // Scalafix
   val organizeImports = "0.4.4"
 }
 
-object prediction extends CommonModule {
+object prediction extends ScalaModule with TpolecatModule with StyleModule with ScoverageModule {
+
+  override def scalaVersion = "2.13.4"
+
+  override def scoverageVersion = "1.4.2"
 
   override def artifactName = "prediction"
 
-  override def forkArgs = Seq("-Xmx256M")
+  override def forkArgs = Seq("-Xmx64M")
 
   override def ivyDeps =
     Agg(
-      ivy"org.typelevel::alleycats-core:${Dependencies.cats}",
       ivy"org.typelevel::cats-core:${Dependencies.cats}",
       ivy"org.typelevel::cats-effect:${Dependencies.catsEffect}",
+      ivy"io.chrisdavenport::fuuid:${Dependencies.fuuid}",
+      ivy"io.chrisdavenport::cats-time:${Dependencies.catsTime}",
+      ivy"io.chrisdavenport::cats-effect-time:${Dependencies.catsEffectTime}",
+      ivy"dev.profunktor::console4cats:${Dependencies.console4cats}",
       ivy"org.typelevel::kittens:${Dependencies.kittens}",
-      ivy"org.typelevel::mouse:${Dependencies.mouse}",
       ivy"co.fs2::fs2-core:${Dependencies.fs2}",
       ivy"co.fs2::fs2-io:${Dependencies.fs2}",
-      ivy"org.tpolecat::atto-core:${Dependencies.atto}",
-      ivy"org.tpolecat::atto-fs2:${Dependencies.atto}",
-      ivy"org.tpolecat::atto-refined:${Dependencies.atto}",
-      ivy"com.lihaoyi::mainargs:${Dependencies.mainargs}",
-      ivy"org.scalanlp::breeze:${Dependencies.breeze}",
-      ivy"org.scalanlp::breeze-natives:${Dependencies.breeze}",
-      ivy"org.scalanlp::breeze-viz:${Dependencies.breeze}",
-      ivy"io.chrisdavenport::log4cats-core:${Dependencies.log4cats}",
-      ivy"io.chrisdavenport::log4cats-slf4j:${Dependencies.log4cats}",
-      ivy"com.chuusai::shapeless:${Dependencies.shapeless}",
       ivy"io.estatico::newtype:${Dependencies.newtype}",
       ivy"eu.timepit::refined:${Dependencies.refined}",
       ivy"eu.timepit::refined-cats:${Dependencies.refined}",
       ivy"com.beachape::enumeratum:${Dependencies.enumeratum}",
-      ivy"com.beachape::enumeratum-cats:${Dependencies.enumeratum}"
+      ivy"com.beachape::enumeratum-cats:${Dependencies.enumeratum}",
+      ivy"com.beachape::enumeratum-scalacheck:${Dependencies.enumeratum}",
+      ivy"org.tpolecat::atto-core:${Dependencies.atto}",
+      ivy"org.tpolecat::atto-fs2:${Dependencies.atto}",
+      ivy"org.tpolecat::atto-refined:${Dependencies.atto}",
+      ivy"org.scalanlp::breeze:${Dependencies.breeze}",
+      ivy"org.scalanlp::breeze-natives:${Dependencies.breeze}"
     )
-
-  override def runIvyDeps =
-    Agg(
-      ivy"org.apache.logging.log4j:log4j-api:${Dependencies.log4j2}",
-      ivy"org.apache.logging.log4j:log4j-core:${Dependencies.log4j2}",
-      ivy"org.apache.logging.log4j:log4j-slf4j-impl:${Dependencies.log4j2}"
-    )
-}
-
-// ----- Base -----
-
-trait CommonModule extends ScalaModule with TpolecatModule with CommonStyleModule {
-
-  override def scalaVersion = "2.13.4"
 
   override def scalacOptions =
     super.scalacOptions() ++
@@ -112,11 +91,25 @@ trait CommonModule extends ScalaModule with TpolecatModule with CommonStyleModul
         ivy"com.github.cb372:::scala-typed-holes:${Dependencies.scalaTypedHoles}",
         ivy"io.tryp:::splain::${Dependencies.splain}"
       )
-}
 
-trait CommonStyleModule extends StyleModule {
   override def scalafixIvyDeps =
     Agg(
       ivy"com.github.liancheng::organize-imports:${Dependencies.organizeImports}"
     )
+
+  object test extends ScoverageTests with StyleModule {
+
+    override def ivyDeps =
+      Agg(
+        ivy"com.disneystreaming::weaver-cats:${Dependencies.weaver}",
+        ivy"com.disneystreaming::weaver-scalacheck:${Dependencies.weaver}"
+      )
+
+    override def scalafixIvyDeps =
+      Agg(
+        ivy"com.github.liancheng::organize-imports:${Dependencies.organizeImports}"
+      )
+
+    override def testFrameworks = Seq("weaver.framework.CatsEffect")
+  }
 }

@@ -3,6 +3,7 @@ name: ci
 on:
   push:
     branches:
+      - master
       - main
   pull_request:
 
@@ -53,4 +54,4 @@ jobs:
         uses: codecov/codecov-action@v1.2.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          fail_ci_if_error: tru
+          fail_ci_if_error: true

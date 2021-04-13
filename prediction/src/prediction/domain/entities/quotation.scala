@@ -13,8 +13,8 @@ import java.{ time => jt }
 object quotation {
   @newtype case class QuotationExchangeDate(value: jt.LocalDateTime)
   object QuotationExchangeDate {
-    implicit val eqForQuotationExchangeDate: Eq[QuotationExchangeDate]     = deriving
-    implicit val showForQuotationExchangeDate: Show[QuotationExchangeDate] = deriving
+    implicit val orderForQuotationExchangeDate: Order[QuotationExchangeDate] = deriving
+    implicit val showForQuotationExchangeDate: Show[QuotationExchangeDate]   = deriving
   }
 
   @newtype case class QuotationNegotiationCode(value: String)

@@ -2,10 +2,6 @@
   "files.watcherExclude": {
     "**/target": true
   },
-  "cSpell.words": [
-    "COTAHIST",
-    "especi"
-  ],
   "metals.showImplicitArguments": false,
   "metals.showImplicitConversionsAndClasses": false
 }

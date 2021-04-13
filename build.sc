@@ -14,51 +14,48 @@ import $ivy.`io.github.davidgregory084::mill-tpolecat:0.2.0`
 import io.github.davidgregory084.TpolecatModule
 
 object Dependencies {
-  val cats           = "2.4.2"
-  val catsEffect     = "2.3.3"
+  val cats           = "2.5.0"
+  val catsEffect     = "3.0.2"
   val catsTime       = "0.3.4"
   val catsEffectTime = "0.1.2"
-  val console4cats   = "0.8.1"
-  val fuuid          = "0.5.0"
-  val kittens        = "2.2.1"
-  val fs2            = "2.5.3"
+  val kittens        = "2.2.2"
+  val fs2            = "3.0.1"
   val newtype        = "0.4.4"
-  val refined        = "0.9.21"
+  val refined        = "0.9.23"
   val enumeratum     = "1.6.1"
   val breeze         = "1.1"
-  val atto           = "0.9.2"
+  val atto           = "0.9.3"
 
   // Testing
-  val weaver = "0.6.0-M6"
+  val munit           = "0.7.23"
+  val munitCatsEffect = "1.0.1"
 
   // Compiler Plugins
   val kindProjector    = "0.11.3"
   val betterMonadicFor = "0.3.1"
-  val scalaTypedHoles  = "0.1.7"
-  val splain           = "0.5.7"
+  val scalaTypedHoles  = "0.1.8"
+  val splain           = "0.5.8"
 
   // Scalafix
-  val organizeImports = "0.4.4"
+  val organizeImports = "0.5.0"
 }
 
-object prediction extends ScalaModule with TpolecatModule with StyleModule with ScoverageModule {
+object prediction extends ScalaModule with TpolecatModule with StyleModule with CommonScoverageModule {
 
   override def scalaVersion = "2.13.4"
 
-  override def scoverageVersion = "1.4.2"
+  override def coverageExcludedPackages = "prediction.application.*"
 
   override def artifactName = "prediction"
 
-  override def forkArgs = Seq("-Xmx64M")
+  // override def forkArgs = Seq("-Xmx64M")
 
   override def ivyDeps =
     Agg(
       ivy"org.typelevel::cats-core:${Dependencies.cats}",
       ivy"org.typelevel::cats-effect:${Dependencies.catsEffect}",
-      ivy"io.chrisdavenport::fuuid:${Dependencies.fuuid}",
       ivy"io.chrisdavenport::cats-time:${Dependencies.catsTime}",
       ivy"io.chrisdavenport::cats-effect-time:${Dependencies.catsEffectTime}",
-      ivy"dev.profunktor::console4cats:${Dependencies.console4cats}",
       ivy"org.typelevel::kittens:${Dependencies.kittens}",
       ivy"co.fs2::fs2-core:${Dependencies.fs2}",
       ivy"co.fs2::fs2-io:${Dependencies.fs2}",
@@ -101,8 +98,9 @@ object prediction extends ScalaModule with TpolecatModule with StyleModule with 
 
     override def ivyDeps =
       Agg(
-        ivy"com.disneystreaming::weaver-cats:${Dependencies.weaver}",
-        ivy"com.disneystreaming::weaver-scalacheck:${Dependencies.weaver}"
+        ivy"org.scalameta::munit::${Dependencies.munit}",
+        ivy"org.scalameta::munit-scalacheck::${Dependencies.munit}",
+        ivy"org.typelevel::munit-cats-effect-3::${Dependencies.munitCatsEffect}"
       )
 
     override def scalafixIvyDeps =
@@ -110,6 +108,22 @@ object prediction extends ScalaModule with TpolecatModule with StyleModule with 
         ivy"com.github.liancheng::organize-imports:${Dependencies.organizeImports}"
       )
 
-    override def testFrameworks = Seq("weaver.framework.CatsEffect")
+    override def testFrameworks = Seq("munit.Framework")
+  }
+}
+
+trait CommonScoverageModule extends ScoverageModule {
+  outer: ScalaModule =>
+
+  def coverageExcludedPackages: T[String] = T("")
+
+  override def scoverageVersion = "1.4.2"
+
+  override val scoverage: ScoverageData = new CustomScoverageData(implicitly)
+
+  class CustomScoverageData(ctx0: mill.define.Ctx) extends ScoverageData(ctx0) {
+    override def scalacOptions =
+      super.scalacOptions() ++
+        Seq(s"-P:scoverage:excludedPackages:${outer.coverageExcludedPackages()}")
   }
 }

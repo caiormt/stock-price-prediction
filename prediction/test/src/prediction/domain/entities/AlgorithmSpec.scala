@@ -2,103 +2,155 @@ package prediction.domain.entities
 
 import cats.implicits._
 
-import cats.effect._
+import munit._
 
-import weaver._
-
+import prediction.domain.entities.Alphabet._
 import prediction.domain.entities.algorithm._
 
-object AlgorithmSpec extends SimpleIOSuite {
-  pureTest("AlgorithmToken.Empty must use Alphabet.Empty") {
-    expect(AlgorithmToken.Empty === AlgorithmToken(Alphabet.Empty))
+final class AlgorithmSpec extends CatsEffectSuite {
+
+  // ----- AlgorithmToken
+
+  test("AlgorithmToken.Empty should be AlgorithmToken(Empty)") {
+    assertEquals(AlgorithmToken.Empty, AlgorithmToken(Empty))
   }
 
-  // -----
-
-  test("AlgorithmSequence(index) access must start by 0") {
-    val sequence = AlgorithmSequence(Vector(AlgorithmToken(Alphabet.Positive)))
-    IO(sequence(0)).attempt.map(either => expect(either.isLeft))
+  test("AlgorithmToken.eq should work correctly") {
+    assert(AlgorithmToken(Empty) === AlgorithmToken(Empty))
   }
 
-  pureTest("AlgorithmSequence(index) access must index by 0") {
+  test("AlgorithmToken.show should use Alphabet.show") {
+    assertEquals(AlgorithmToken(Empty).show, Empty.value.show)
+    assertEquals(AlgorithmToken(Draw).show, Draw.value.show)
+    assertEquals(AlgorithmToken(Positive).show, Positive.value.show)
+    assertEquals(AlgorithmToken(Negative).show, Negative.value.show)
+  }
+
+  // ----- AlgorithmSequence
+
+  test("AlgorithmSequence.eq should work correctly") {
+    assert(AlgorithmSequence(Vector(AlgorithmToken.Empty)) === AlgorithmSequence(Vector(AlgorithmToken.Empty)))
+  }
+
+  test("AlgorithmSequence.show should use AlgorithmToken.show") {
     val sequence = AlgorithmSequence(
       Vector(
-        AlgorithmToken(Alphabet.Positive),
-        AlgorithmToken(Alphabet.Negative),
-        AlgorithmToken(Alphabet.Negative)
+        AlgorithmToken(Draw),
+        AlgorithmToken(Positive),
+        AlgorithmToken(Negative)
       )
     )
-    expect(sequence(1) === AlgorithmToken(Alphabet.Positive))
+
+    val inner = sequence.value.map(_.show).mkString
+    assertEquals(sequence.show, s"[$inner]")
   }
 
-  pureTest("AlgorithmSequence must have size operation") {
-    expect(AlgorithmSequence(Vector.empty).size === 0)
+  test("AlgorithmSequence.size should return sequence size") {
+    val sequence = AlgorithmSequence(
+      Vector(
+        AlgorithmToken(Draw),
+        AlgorithmToken(Positive),
+        AlgorithmToken(Negative)
+      )
+    )
+    assertEquals(sequence.size, 3)
   }
 
-  // -----
-
-  pureTest("AlgorithmScore.Empty must be AlgorithmScore(0)") {
-    expect(AlgorithmScore.Empty === AlgorithmScore(0L))
+  test("AlgorithmSequence.at(index) should access starting index at 1") {
+    val sequence = AlgorithmSequence(
+      Vector(
+        AlgorithmToken(Draw),
+        AlgorithmToken(Positive),
+        AlgorithmToken(Negative)
+      )
+    )
+    intercept[IndexOutOfBoundsException](sequence.at(0))
+    assertEquals(sequence.at(1), AlgorithmToken(Draw))
+    assertEquals(sequence.at(2), AlgorithmToken(Positive))
+    assertEquals(sequence.at(3), AlgorithmToken(Negative))
+    intercept[IndexOutOfBoundsException](sequence.at(4))
   }
 
-  pureTest("AlgorithmScore must have + operation") {
-    val sum = AlgorithmScore(10L) + AlgorithmScore(5L)
-    expect(sum === AlgorithmScore(15L))
+  test("AlgorithmSequence.liftAt(index) should access starting index at 1") {
+    val sequence = AlgorithmSequence(
+      Vector(
+        AlgorithmToken(Draw),
+        AlgorithmToken(Positive),
+        AlgorithmToken(Negative)
+      )
+    )
+    assertEquals(sequence.liftAt(0), none)
+    assertEquals(sequence.liftAt(1), AlgorithmToken(Draw).some)
+    assertEquals(sequence.liftAt(2), AlgorithmToken(Positive).some)
+    assertEquals(sequence.liftAt(3), AlgorithmToken(Negative).some)
+    assertEquals(sequence.liftAt(4), none)
   }
 
-  pureTest("AlgorithmScore must have * operation") {
-    val sum = AlgorithmScore(2L) * AlgorithmScore(4L)
-    expect(sum === AlgorithmScore(8L))
+  // ----- AlgorithmAlignment
+
+  test("AlgorithmAlignment.eq should work correctly") {
+    val left  = AlgorithmSequence(Vector(AlgorithmToken.Empty))
+    val right = AlgorithmSequence(Vector(AlgorithmToken(Draw)))
+    assert(AlgorithmAlignment(left, right) === AlgorithmAlignment(left, right))
   }
 
-  pureTest("AlgorithmScore must have * operation with scalar") {
-    val sum = AlgorithmScore(2L) * 4L
-    expect(sum === AlgorithmScore(8L))
+  test("AlgorithmAlignment.show should use AlgorithmSequence.show") {
+    val left      = AlgorithmSequence(Vector(AlgorithmToken.Empty))
+    val right     = AlgorithmSequence(Vector(AlgorithmToken(Draw)))
+    val alignment = AlgorithmAlignment(left, right)
+    assertEquals(alignment.show, show"$left\n$right")
   }
 
-  pureTest("AlgorithmScore must have * operation with scalar conversion") {
-    val sum = AlgorithmScore(2L) * 4
-    expect(sum === AlgorithmScore(8L))
+  // ----- AlgorithmScore
+
+  test("AlgorithmScore.eq should work correctly") {
+    assert(AlgorithmScore(5L) === AlgorithmScore(5L))
   }
 
-  // -----
-
-  pureTest("RowIndex.Empty must be RowIndex(0)") {
-    expect(RowIndex.Empty === RowIndex(0))
+  test("AlgorithmScore.show should work correctly") {
+    val score = AlgorithmScore(5L)
+    assertEquals(score.show, "5")
   }
 
-  pureTest("RowIndex must have - operation") {
-    expect(RowIndex(5) - 1 === RowIndex(4))
+  test("AlgorithmScore.Empty should be AlgorithmScore(0)") {
+    assertEquals(AlgorithmScore.Empty, AlgorithmScore(0L))
   }
 
-  pureTest("ColumnIndex.Empty must be ColumnIndex(0)") {
-    expect(ColumnIndex.Empty === ColumnIndex(0))
+  test("AlgorithmScore.One should be AlgorithmScore(1)") {
+    assertEquals(AlgorithmScore.One, AlgorithmScore(1L))
   }
 
-  pureTest("ColumnIndex must have - operation") {
-    expect(ColumnIndex(5) - 1 === ColumnIndex(4))
+  test("AlgorithmScore * scalar should multiply properly") {
+    assertEquals(AlgorithmScore.One * 5, AlgorithmScore(5L))
   }
 
-  pureTest("SequenceIndex.Empty must be SequenceIndex(0)") {
-    expect(SequenceIndex.Empty === SequenceIndex(0))
+  test("AlgorithmScore + AlgorithmScore should sum properly") {
+    assertEquals(AlgorithmScore.One + AlgorithmScore(4L), AlgorithmScore(5L))
   }
 
-  pureTest("SequenceIndex must have + operation") {
-    expect(SequenceIndex(5) + 1 === SequenceIndex(6))
+  // ----- AlgorithmStep
+
+  test("AlgorithmStep.eq should work correctly") {
+    assert(AlgorithmStep(4, 4, 5) === AlgorithmStep(4, 4, 5))
   }
 
-  pureTest("Step must have Up operation") {
-    val step = Step(RowIndex(5), ColumnIndex(5), SequenceIndex(0))
-    expect(step.up === Step(RowIndex(4), ColumnIndex(5), SequenceIndex(1)))
+  test("AlgorithmStep.show should work correctly") {
+    val score = AlgorithmStep(4, 4, 5)
+    assertEquals(score.show, "AlgorithmStep(i = 4, j = 4, k = 5)")
   }
 
-  pureTest("Step must have UpLeft operation") {
-    val step = Step(RowIndex(5), ColumnIndex(5), SequenceIndex(0))
-    expect(step.upLeft === Step(RowIndex(4), ColumnIndex(4), SequenceIndex(1)))
+  test("AlgorithmStep should have Up operation") {
+    val step = AlgorithmStep(5, 5)
+    assertEquals(step.up, AlgorithmStep(4, 5, 1))
   }
 
-  pureTest("Step must have Left operation") {
-    val step = Step(RowIndex(5), ColumnIndex(5), SequenceIndex(0))
-    expect(step.left === Step(RowIndex(5), ColumnIndex(4), SequenceIndex(1)))
+  test("AlgorithmStep should have UpLeft operation") {
+    val step = AlgorithmStep(5, 5)
+    assertEquals(step.upLeft, AlgorithmStep(4, 4, 1))
+  }
+
+  test("AlgorithmStep should have Left operation") {
+    val step = AlgorithmStep(5, 5)
+    assertEquals(step.left, AlgorithmStep(5, 4, 1))
   }
 }

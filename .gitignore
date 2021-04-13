@@ -183,9 +183,9 @@ local.properties
 .worksheet
 .ammonite
 .bloop
+.bsp
 .metals
 **/metals.sbt
 *.txt
 *.TXT
-*.zip
 *.ZIP

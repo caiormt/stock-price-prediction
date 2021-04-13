@@ -11,122 +11,87 @@ object algorithm {
   object AlgorithmToken {
     val Empty: AlgorithmToken = AlgorithmToken(Alphabet.Empty)
 
-    implicit val eqForAlgorithmToken: Eq[AlgorithmToken]     = deriving
+    implicit val eqForAlgorithmToken: Eq[AlgorithmToken] =
+      deriving
+
     implicit val showForAlgorithmToken: Show[AlgorithmToken] =
       Show.show[AlgorithmToken](_.value.value.show)
   }
 
   @newtype case class AlgorithmSequence(value: Vector[AlgorithmToken])
   object AlgorithmSequence {
-    implicit val eqForAlgorithmSequence: Eq[AlgorithmSequence]     = deriving
+    implicit val eqForAlgorithmSequence: Eq[AlgorithmSequence] =
+      deriving
+
     implicit val showForAlgorithmSequence: Show[AlgorithmSequence] =
-      Show.show[AlgorithmSequence](_.value.foldMap(_.show))
+      Show.show[AlgorithmSequence](_.value.map(_.show).mkString_("[", "", "]"))
 
     implicit final class AlgorithmSequenceOps(private val sequence: AlgorithmSequence) extends AnyVal {
-      def apply(index: Index): AlgorithmToken = sequence.value(index.value - 1)
-      def apply(index: Int): AlgorithmToken   = sequence.value(index - 1)
-      def size: Int                           = sequence.value.size
+      def size: Int =
+        sequence.value.size
+
+      def at(index: Int): AlgorithmToken =
+        sequence.value(index - 1)
+
+      def liftAt(index: Int): Option[AlgorithmToken] =
+        sequence.value.lift(index - 1)
     }
+  }
+
+  final case class AlgorithmAlignment(left: AlgorithmSequence, right: AlgorithmSequence)
+  object AlgorithmAlignment {
+    implicit val eqForAlgorithmAlignment: Eq[AlgorithmAlignment] =
+      semiauto.eq
+
+    implicit val showForAlgorithmAlignment: Show[AlgorithmAlignment] =
+      Show.show[AlgorithmAlignment](alignment => show"${alignment.left}\n${alignment.right}")
   }
 
   @newtype case class AlgorithmScore(value: Long)
   object AlgorithmScore {
     val Empty: AlgorithmScore = AlgorithmScore(0L)
+    val One: AlgorithmScore   = AlgorithmScore(1L)
 
-    implicit val orderForAlgorithmScore: Order[AlgorithmScore] = deriving
-    implicit val showForAlgorithmScore: Show[AlgorithmScore]   = deriving
+    implicit val orderForAlgorithmScore: Order[AlgorithmScore] =
+      deriving
+
+    implicit val showForAlgorithmScore: Show[AlgorithmScore] =
+      deriving
 
     implicit final class AlgorithmScoreOps(private val score: AlgorithmScore) extends AnyVal {
-      def +(that: AlgorithmScore): AlgorithmScore = AlgorithmScore(score.value + that.value)
-      def *(that: AlgorithmScore): AlgorithmScore = AlgorithmScore(score.value * that.value)
-      def *(that: Int): AlgorithmScore            = AlgorithmScore(score.value * that.toLong)
-      def *(that: Long): AlgorithmScore           = AlgorithmScore(score.value * that)
+      def *(that: Int): AlgorithmScore =
+        AlgorithmScore(score.value * that)
+
+      def +(that: AlgorithmScore): AlgorithmScore =
+        AlgorithmScore(score.value + that.value)
     }
   }
 
-  final case class AlgorithmAlignment(first: AlgorithmSequence, second: AlgorithmSequence)
-  object AlgorithmAlignment {
-    implicit val eqForAlgorithmAlignment: Eq[AlgorithmAlignment]     = semiauto.eq
-    implicit val showForAlgorithmAlignment: Show[AlgorithmAlignment] = semiauto.show
-  }
+  /**
+    * Represents the snapshot at each iteration during sequence alignment.
+    *
+    * @param i index of first sequence to consume
+    * @param j index of second sequence to consume
+    * @param k index to attribute the token at `i` index from first sequence or `j` index from second sequence.
+    */
+  final case class AlgorithmStep(i: Int, j: Int, k: Int)
+  object AlgorithmStep {
+    def apply(i: Int, j: Int): AlgorithmStep =
+      AlgorithmStep(i, j, k = 0)
 
-  // -----
+    implicit val eqForAlgorithmStep: Eq[AlgorithmStep] =
+      semiauto.eq
 
-  @newtype case class Index(value: Int)
-  object Index {
-    implicit val eqForIndex: Eq[Index]     = deriving
-    implicit val showForIndex: Show[Index] = deriving
-  }
+    implicit val showForAlgorithmStep: Show[AlgorithmStep] =
+      semiauto.show
 
-  @newtype case class RowIndex(value: Int)
-  object RowIndex {
-    val Empty: RowIndex = RowIndex(0)
-
-    implicit val eqForRowIndex: Eq[RowIndex]     = deriving
-    implicit val showForRowIndex: Show[RowIndex] = deriving
-
-    implicit final class RowIndexOps(private val row: RowIndex) extends AnyVal {
-      def -(value: Int): RowIndex = RowIndex(row.value - value)
-      def +(value: Int): RowIndex = RowIndex(row.value + value)
-    }
-  }
-
-  @newtype case class ColumnIndex(value: Int)
-  object ColumnIndex {
-    val Empty: ColumnIndex = ColumnIndex(0)
-
-    implicit val eqForColumnIndex: Eq[ColumnIndex]     = deriving
-    implicit val showForColumnIndex: Show[ColumnIndex] = deriving
-
-    implicit final class ColumnIndexOps(private val column: ColumnIndex) extends AnyVal {
-      def -(value: Int): ColumnIndex = ColumnIndex(column.value - value)
-    }
-  }
-
-  @newtype case class SequenceIndex(value: Int)
-  object SequenceIndex {
-    val Empty: SequenceIndex = SequenceIndex(0)
-
-    implicit val eqForSequenceIndex: Eq[SequenceIndex]     = deriving
-    implicit val showForSequenceIndex: Show[SequenceIndex] = deriving
-
-    implicit final class SequenceIndexOps(private val sequence: SequenceIndex) extends AnyVal {
-      def +(value: Int): SequenceIndex = SequenceIndex(sequence.value + value)
-    }
-  }
-
-  final case class Step(i: RowIndex, j: ColumnIndex, k: SequenceIndex)
-  object Step {
-    implicit val eqForStep: Eq[Step]     = semiauto.eq
-    implicit val showForStep: Show[Step] = semiauto.show
-
-    implicit final class StepOps(private val step: Step) extends AnyVal {
-      import step._
+    implicit final class AlgorithmStepOps(private val algorithmStep: AlgorithmStep) extends AnyVal {
+      import algorithmStep._
       // format: off
-      def up: Step     = Step(i - 1, j    , k + 1)
-      def upLeft: Step = Step(i - 1, j - 1, k + 1)
-      def left: Step   = Step(i    , j - 1, k + 1)
+      def up: AlgorithmStep     = AlgorithmStep(i - 1, j    , k + 1)
+      def upLeft: AlgorithmStep = AlgorithmStep(i - 1, j - 1, k + 1)
+      def left: AlgorithmStep   = AlgorithmStep(i    , j - 1, k + 1)
       // format: on
     }
   }
-
-  // -----
-
-  sealed abstract class AlgorithmError extends RuntimeException
-  final case object NotEnoughDataToPredict extends AlgorithmError
-
-  // -----
-
-  implicit final class VectorIndexedOps[A](private val vector: Vector[A]) extends AnyVal {
-    def at(index: Index): A = vector(index.value - 1)
-  }
-
-  implicit def RowIndexToIndexOps(rowIndex: RowIndex): Index =
-    Index(rowIndex.value)
-
-  implicit def ColumnIndexToIndexOps(columnIndex: ColumnIndex): Index =
-    Index(columnIndex.value)
-
-  implicit def SequenceIndexToIndexOps(sequenceIndex: SequenceIndex): Index =
-    Index(sequenceIndex.value)
 }

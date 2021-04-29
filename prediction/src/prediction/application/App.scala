@@ -36,68 +36,21 @@ object App extends IOApp.Simple {
   override def run: IO[Unit] =
     load[IO]("COTAHIST_BOVA11.txt").memoize.flatMap { quotations =>
       // format: off
-      runCase(   month2020Year2019(quotations)) *>
-      runCase(biweekly2020Year2019(quotations)) *>
-      runCase(  weekly2020Year2019(quotations)) *>
-      runCase(   month2019Year2018(quotations)) *>
-      runCase(biweekly2019Year2018(quotations)) *>
-      runCase(  weekly2019Year2018(quotations)) *>
-      runCase(   month2018Year2017(quotations)) *>
-      runCase(biweekly2018Year2017(quotations)) *>
-      runCase(  weekly2018Year2017(quotations)) *>
-      runCase(   month2017Year2016(quotations)) *>
-      runCase(biweekly2017Year2016(quotations)) *>
-      // runCase(  weekly2017Year2016(quotations)) *>
-      runCase(   month2016Year2015(quotations)) *>
-      runCase(biweekly2016Year2015(quotations)) *>
-      runCase(  weekly2016Year2015(quotations))
+      testOn(2020, quotations) *>
+      testOn(2019, quotations) *>
+      testOn(2018, quotations) *>
+      testOn(2017, quotations) *>
+      testOn(2016, quotations)
       // format: on
     }
 
-  def month2020Year2019(quotations: Quotations[IO]): IO[Unit] =
-    monthlyYear(quotations, 2020, 2019)
-
-  def biweekly2020Year2019(quotations: Quotations[IO]): IO[Unit] =
-    biweeklyYear(quotations, 2020, 2019)
-
-  def weekly2020Year2019(quotations: Quotations[IO]): IO[Unit] =
-    weeklyYear(quotations, 2020, 2019)
-
-  def month2019Year2018(quotations: Quotations[IO]): IO[Unit] =
-    monthlyYear(quotations, 2019, 2018)
-
-  def biweekly2019Year2018(quotations: Quotations[IO]): IO[Unit] =
-    biweeklyYear(quotations, 2019, 2018)
-
-  def weekly2019Year2018(quotations: Quotations[IO]): IO[Unit] =
-    weeklyYear(quotations, 2019, 2018)
-
-  def month2018Year2017(quotations: Quotations[IO]): IO[Unit] =
-    monthlyYear(quotations, 2018, 2017)
-
-  def biweekly2018Year2017(quotations: Quotations[IO]): IO[Unit] =
-    biweeklyYear(quotations, 2018, 2017)
-
-  def weekly2018Year2017(quotations: Quotations[IO]): IO[Unit] =
-    weeklyYear(quotations, 2018, 2017)
-
-  def month2017Year2016(quotations: Quotations[IO]): IO[Unit] =
-    monthlyYear(quotations, 2017, 2016)
-
-  def biweekly2017Year2016(quotations: Quotations[IO]): IO[Unit] =
-    biweeklyYear(quotations, 2017, 2016)
-
-  def weekly2017Year2016(quotations: Quotations[IO]): IO[Unit] =
-    weeklyYear(quotations, 2017, 2016)
-
-  def month2016Year2015(quotations: Quotations[IO]): IO[Unit] =
-    monthlyYear(quotations, 2016, 2015)
-
-  def biweekly2016Year2015(quotations: Quotations[IO]): IO[Unit] =
-    biweeklyYear(quotations, 2016, 2015)
-
-  def weekly2016Year2015(quotations: Quotations[IO]): IO[Unit] =
-    weeklyYear(quotations, 2016, 2015)
+  def testOn(year: Int, quotations: Quotations[IO]): IO[Unit] =
+    // format: off
+    runCase(    monthlyYear2(quotations, year, year - 1)) *>
+    runCase(   biweeklyYear2(quotations, year, year - 1)) *>
+    runCase(     weeklyYear2(quotations, year, year - 1)) *>
+    runCase(goldenNumberYear(quotations, year, year - 1))
+    // format: on
 
   // -----
 
@@ -107,6 +60,20 @@ object App extends IOApp.Simple {
       guesses <- (1 to 12).toList
                    .parTraverse { month =>
                      application[IO](quotations, monthFilter(month, actual), yearFilter(reference))
+                   }
+                   .nested
+                   .filter(identity)
+                   .value
+                   .map(_.size)
+      _       <- IO.println(show"Guessed $guesses correctly out of 12")
+    } yield ()
+
+  def monthlyYear2(quotations: Quotations[IO], actual: Int, reference: Int): IO[Unit] =
+    for {
+      _       <- IO.println(show"Predicting with 1 month of $actual in $reference")
+      guesses <- (1 to 12).toList
+                   .parTraverse { month =>
+                     application[IO](quotations, monthFilter(month, actual), upToYearFilter(reference))
                    }
                    .nested
                    .filter(identity)
@@ -128,7 +95,24 @@ object App extends IOApp.Simple {
                    .filter(identity)
                    .value
                    .map(_.size)
-      _       <- IO.println(show"Guessed $guesses correctly out of 24")
+      _       <- IO.println(show"Guessed $guesses correctly out of 12")
+    } yield ()
+
+  def biweeklyYear2(quotations: Quotations[IO], actual: Int, reference: Int): IO[Unit] =
+    for {
+      _                <- IO.println(show"Predicting with 10 days of $actual in $reference")
+      result           <- quotations.flatMap { quotations =>
+                            quotations
+                              .filter(yearFilter(actual))
+                              .sliding(10, 10)
+                              .filter(_.size === 10)
+                              .toList
+                              .parTraverse { actual =>
+                                application2[IO](IO(quotations), IO(actual), upToYearFilter(reference))
+                              }
+                          }
+      (guesses, total) <- IO(result.filter(identity).size -> result.size)
+      _                <- IO.println(show"Guessed $guesses correctly out of $total")
     } yield ()
 
   def weeklyYear(quotations: Quotations[IO], actual: Int, reference: Int): IO[Unit] =
@@ -147,6 +131,40 @@ object App extends IOApp.Simple {
       _       <- IO.println(show"Guessed $guesses correctly out of 48")
     } yield ()
 
+  def weeklyYear2(quotations: Quotations[IO], actual: Int, reference: Int): IO[Unit] =
+    for {
+      _                <- IO.println(show"Predicting with 5 days of $actual in $reference")
+      result           <- quotations.flatMap { quotations =>
+                            quotations
+                              .filter(yearFilter(actual))
+                              .sliding(5, 5)
+                              .filter(_.size === 5)
+                              .toList
+                              .parTraverse { actual =>
+                                application2[IO](IO(quotations), IO(actual), upToYearFilter(reference))
+                              }
+                          }
+      (guesses, total) <- IO(result.filter(identity).size -> result.size)
+      _                <- IO.println(show"Guessed $guesses correctly out of $total")
+    } yield ()
+
+  def goldenNumberYear(quotations: Quotations[IO], actual: Int, reference: Int): IO[Unit] =
+    for {
+      _                <- IO.println(show"Predicting with 17 days of $actual in $reference")
+      result           <- quotations.flatMap { quotations =>
+                            quotations
+                              .filter(yearFilter(actual))
+                              .sliding(17, 17)
+                              .filter(_.size === 17)
+                              .toList
+                              .parTraverse { actual =>
+                                application2[IO](IO(quotations), IO(actual), upToYearFilter(reference))
+                              }
+                          }
+      (guesses, total) <- IO(result.filter(identity).size -> result.size)
+      _                <- IO.println(show"Guessed $guesses correctly out of $total")
+    } yield ()
+
   def runCase(f: IO[Unit]): IO[Unit] =
     start *> f <* end
 
@@ -161,6 +179,11 @@ object App extends IOApp.Simple {
   def yearFilter(year: Int)(quotation: Quotation): Boolean = {
     val date = quotation.exchangeDate.value
     date.getYear === year
+  }
+
+  def upToYearFilter(year: Int)(quotation: Quotation): Boolean = {
+    val date = quotation.exchangeDate.value
+    date.getYear <= year
   }
 
   def monthFilter(month: Int, year: Int)(quotation: Quotation): Boolean = {
@@ -189,6 +212,20 @@ object App extends IOApp.Simple {
       lastExchangeDate    <- getLastExchangeDate(actual)
       expected            <- getExpectedResult(lastExchangeDate)(quotations)
       predicted           <- predictor.predict(actual, reference)
+      // aligner             <- quotationAligner
+      // alignment           <- aligner.align(actual, reference)
+      // _                   <- Sync[F].blocking(println(show"Expected:  $expected\nPredicted: $predicted"))
+      // _                   <- Sync[F].blocking(println(alignment.show))
+    } yield expected === predicted
+
+  def application2[F[_]: Async](quotations: Quotations[F], actual: Quotations[F], referenceFilter: Filter): F[Boolean] =
+    for {
+      predictor        <- quotationPredictor
+      actual           <- actual
+      reference        <- prepare(quotations, referenceFilter)
+      lastExchangeDate <- getLastExchangeDate(actual)
+      expected         <- getExpectedResult(lastExchangeDate)(quotations)
+      predicted        <- predictor.predict(actual, reference)
       // aligner             <- quotationAligner
       // alignment           <- aligner.align(actual, reference)
       // _                   <- Sync[F].blocking(println(show"Expected:  $expected\nPredicted: $predicted"))

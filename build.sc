@@ -7,7 +7,7 @@ import $ivy.`com.lihaoyi::mill-contrib-bloop:$MILL_VERSION`
 import $ivy.`com.lihaoyi::mill-contrib-scoverage:$MILL_VERSION`
 import mill.contrib.scoverage.ScoverageModule
 
-import $ivy.`com.goyeau::mill-scalafix:0.2.1`
+import $ivy.`com.goyeau::mill-scalafix:0.2.2`
 import com.goyeau.mill.scalafix.StyleModule
 
 import $ivy.`io.github.davidgregory084::mill-tpolecat:0.2.0`
@@ -18,13 +18,13 @@ object Dependencies {
   val catsEffect     = "3.1.0"
   val catsTime       = "0.3.4"
   val catsEffectTime = "0.1.2"
-  val kittens        = "2.2.2"
+  val kittens        = "2.3.1"
   val fs2            = "3.0.2"
   val newtype        = "0.4.4"
   val refined        = "0.9.24"
   val enumeratum     = "1.6.1"
   val breeze         = "1.2"
-  val atto           = "0.9.3"
+  val atto           = "0.9.4"
 
   // Testing
   val munit           = "0.7.25"
@@ -42,7 +42,7 @@ object Dependencies {
 
 object prediction extends ScalaModule with TpolecatModule with StyleModule with CommonScoverageModule {
 
-  override def scalaVersion = "2.13.4"
+  override def scalaVersion = "2.13.5"
 
   override def coverageExcludedPackages = "prediction.application.*"
 
@@ -117,7 +117,9 @@ trait CommonScoverageModule extends ScoverageModule {
 
   def coverageExcludedPackages: T[String] = T("")
 
-  override def scoverageVersion = "1.4.2"
+  override def scoverageVersion = "1.4.6"
+
+  override def scoveragePluginDep = T(ivy"org.scoverage:::scalac-scoverage-plugin:${scoverageVersion()}")
 
   override val scoverage: ScoverageData = new CustomScoverageData(implicitly)
 

@@ -14,21 +14,21 @@ import $ivy.`io.github.davidgregory084::mill-tpolecat:0.2.0`
 import io.github.davidgregory084.TpolecatModule
 
 object Dependencies {
-  val cats           = "2.6.0"
-  val catsEffect     = "3.1.0"
+  val cats           = "2.6.1"
+  val catsEffect     = "3.1.1"
   val catsTime       = "0.3.4"
   val catsEffectTime = "0.1.2"
   val kittens        = "2.3.1"
-  val fs2            = "3.0.2"
+  val fs2            = "3.0.3"
   val newtype        = "0.4.4"
-  val refined        = "0.9.24"
+  val refined        = "0.9.25"
   val enumeratum     = "1.6.1"
   val breeze         = "1.2"
-  val atto           = "0.9.4"
+  val atto           = "0.9.5"
 
   // Testing
-  val munit           = "0.7.25"
-  val munitCatsEffect = "1.0.2"
+  val munit           = "0.7.26"
+  val munitCatsEffect = "1.0.3"
 
   // Compiler Plugins
   val kindProjector    = "0.11.3"
@@ -117,7 +117,7 @@ trait CommonScoverageModule extends ScoverageModule {
 
   def coverageExcludedPackages: T[String] = T("")
 
-  override def scoverageVersion = "1.4.6"
+  override def scoverageVersion = "1.4.7"
 
   override def scoveragePluginDep = T(ivy"org.scoverage:::scalac-scoverage-plugin:${scoverageVersion()}")
 

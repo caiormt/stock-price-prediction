@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" strict="true" xmlns="http://logging.apache.org/log4j/2.0/config" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://logging.apache.org/log4j/2.0/config
+  https://raw.githubusercontent.com/apache/logging-log4j2/log4j-2.13.3/log4j-core/src/main/resources/Log4j-config.xsd">
+
+  <!-- Properties -->
+  <Properties>
+    <Property name="LEVEL_PATTERN">%highlight{%5p}{FATAL=red blink, ERROR=red, WARN=yellow bold, INFO=green, DEBUG=green bold, TRACE=blue}</Property>
+    <Property name="LOG_PATTERN">%d{yyyy-MM-dd HH:mm:ss.SSS} - ${LEVEL_PATTERN} [%15.15t] %style{%-15.15c}{cyan}: %m%n%xEx</Property>
+    <Property name="LOG_LEVEL">${env:LOG_LEVEL:-DEBUG}</Property>
+    <Property name="ROOT_LOG_LEVEL">${env:ROOT_LOG_LEVEL:-INFO}</Property>
+  </Properties>
+
+  <!-- Appenders -->
+  <Appenders>
+    <Console name="STD_OUT" target="SYSTEM_OUT" follow="true">
+      <PatternLayout pattern="${LOG_PATTERN}" noConsoleNoAnsi="true" />
+    </Console>
+
+    <RollingFile name="FILE_APPENDER" fileName="${sys:user.dir}/log/core.log" filePattern="${sys:user.dir}/log/core.%d{yyyyMMdd}-%d{HH}.log" ignoreExceptions="false">
+      <PatternLayout pattern="%m%n" />
+      <Policies>
+        <TimeBasedTriggeringPolicy interval="1" modulate="true" />
+      </Policies>
+      <DefaultRolloverStrategy max="20" />
+    </RollingFile>
+  </Appenders>
+
+  <!-- Loggers -->
+  <Loggers>
+    <Logger name="prediction" level="${LOG_LEVEL}" additivity="false">
+      <AppenderRef ref="FILE_APPENDER" />
+    </Logger>
+
+    <Logger name="console" level="${LOG_LEVEL}" additivity="false">
+      <AppenderRef ref="STD_OUT" />
+    </Logger>
+
+    <Root level="${ROOT_LOG_LEVEL}">
+      <AppenderRef ref="STD_OUT" />
+      <AppenderRef ref="FILE_APPENDER" />
+    </Root>
+  </Loggers>
+</Configuration>

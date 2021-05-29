@@ -18,13 +18,17 @@ object Dependencies {
   val catsEffect     = "3.1.1"
   val catsTime       = "0.3.4"
   val catsEffectTime = "0.1.2"
-  val kittens        = "2.3.1"
-  val fs2            = "3.0.3"
+  val kittens        = "2.3.2"
+  val fs2            = "3.0.4"
   val newtype        = "0.4.4"
-  val refined        = "0.9.25"
+  val refined        = "0.9.26"
   val enumeratum     = "1.6.1"
   val breeze         = "1.2"
   val atto           = "0.9.5"
+
+  // Logging
+  val log4cats = "2.1.1"
+  val log4j2   = "2.14.1"
 
   // Testing
   val munit           = "0.7.26"
@@ -57,6 +61,7 @@ object prediction extends ScalaModule with TpolecatModule with StyleModule with 
       ivy"io.chrisdavenport::cats-time:${Dependencies.catsTime}",
       ivy"io.chrisdavenport::cats-effect-time:${Dependencies.catsEffectTime}",
       ivy"org.typelevel::kittens:${Dependencies.kittens}",
+      ivy"org.typelevel::log4cats-slf4j:${Dependencies.log4cats}",
       ivy"co.fs2::fs2-core:${Dependencies.fs2}",
       ivy"co.fs2::fs2-io:${Dependencies.fs2}",
       ivy"io.estatico::newtype:${Dependencies.newtype}",
@@ -70,6 +75,13 @@ object prediction extends ScalaModule with TpolecatModule with StyleModule with 
       ivy"org.tpolecat::atto-refined:${Dependencies.atto}",
       ivy"org.scalanlp::breeze:${Dependencies.breeze}",
       ivy"org.scalanlp::breeze-natives:${Dependencies.breeze}"
+    )
+
+  override def runIvyDeps =
+    Agg(
+      ivy"org.apache.logging.log4j:log4j-api:${Dependencies.log4j2}",
+      ivy"org.apache.logging.log4j:log4j-core:${Dependencies.log4j2}",
+      ivy"org.apache.logging.log4j:log4j-slf4j-impl:${Dependencies.log4j2}"
     )
 
   override def scalacOptions =
@@ -117,7 +129,7 @@ trait CommonScoverageModule extends ScoverageModule {
 
   def coverageExcludedPackages: T[String] = T("")
 
-  override def scoverageVersion = "1.4.7"
+  override def scoverageVersion = "1.4.8"
 
   override def scoveragePluginDep = T(ivy"org.scoverage:::scalac-scoverage-plugin:${scoverageVersion()}")
 

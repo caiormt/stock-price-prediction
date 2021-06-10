@@ -39,7 +39,7 @@ jobs:
       - name: Set up Mill
         uses: jodersky/setup-mill@v0.2.3
         with:
-          mill-version: 0.9.7
+          mill-version: 0.9.8
 
       - name: Check Style
         run: mill --no-server all __.checkStyle

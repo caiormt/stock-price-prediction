@@ -74,7 +74,7 @@ final class OptimalAlignmentAlignerService[F[_]: Monad: Parallel, Matrix[_], Vec
     * and decide when consuming token from sequences to the new alignment.
     *
     * @param m Matrix of Optimal Alignments
-    * @param alignment container with `s` and `t` sequences,
+    * @param alignments container with `s` and `t` sequences,
     * representing `left` and `right` aligned sequences, respectively
     * @param sequences container with `left` and `right` original sequences
     * @param step container with current valid indexes
@@ -123,7 +123,7 @@ final class OptimalAlignmentAlignerService[F[_]: Monad: Parallel, Matrix[_], Vec
     *
     * To build the entire sequence, it need to consume the rest of the remaining sequence.
     *
-    * @param alignment container with `s` and `t` sequences,
+    * @param alignments container with `s` and `t` sequences,
     * representing `left` and `right` aligned sequences, respectively
     * @param sequences container with `left` and `right` original sequences
     * @param step container with current valid indexes
@@ -148,7 +148,7 @@ final class OptimalAlignmentAlignerService[F[_]: Monad: Parallel, Matrix[_], Vec
     * The sequence could be of `left.size * right.size`, but only `step.k` is used at end of execution.
     * Take only `step.k` elements and discard the rest.
     *
-    * @param alignment container with `s` and `t` sequences,
+    * @param alignments container with `s` and `t` sequences,
     * representing `left` and `right` aligned sequences, respectively
     * @param step container with current valid indexes
     * @return both sequences best aligned
@@ -168,7 +168,7 @@ final class OptimalAlignmentAlignerService[F[_]: Monad: Parallel, Matrix[_], Vec
     * Consuming 'Up' in the Optimal Alignment Matrix means that choosing the `left` sequence best scores
     * instead of aligning with `right` sequence.
     *
-    * @param alignment container with `s` and `t` sequences,
+    * @param alignments container with `s` and `t` sequences,
     * representing `left` and `right` aligned sequences, respectively
     * @param sequences container with `left` and `right` original sequences
     * @param step container with current valid indexes
@@ -181,7 +181,7 @@ final class OptimalAlignmentAlignerService[F[_]: Monad: Parallel, Matrix[_], Vec
     * Consuming 'UpLeft' in the Optimal Alignment Matrix means that choosing both sequences (match) best scores
     * instead of choosing either sequence only.
     *
-    * @param alignment container with `s` and `t` sequences,
+    * @param alignments container with `s` and `t` sequences,
     * representing `left` and `right` aligned sequences, respectively
     * @param sequences container with `left` and `right` original sequences
     * @param step container with current valid indexes
@@ -194,7 +194,7 @@ final class OptimalAlignmentAlignerService[F[_]: Monad: Parallel, Matrix[_], Vec
     * Consuming 'Left' in the Optimal Alignment Matrix means that choosing the `right` sequence best scores
     * instead of aligning with `left` sequence.
     *
-    * @param alignment container with `s` and `t` sequences,
+    * @param alignments container with `s` and `t` sequences,
     * representing `left` and `right` aligned sequences, respectively
     * @param sequences container with `left` and `right` original sequences
     * @param step container with current valid indexes
@@ -208,7 +208,7 @@ final class OptimalAlignmentAlignerService[F[_]: Monad: Parallel, Matrix[_], Vec
   /**
     * Consumes `left` token at step's position `i`, setting into sequence `s` at `k`
     *
-    * @param alignment container with `s` and `t` sequences,
+    * @param alignments container with `s` and `t` sequences,
     * representing `left` and `right` aligned sequences, respectively
     * @param sequences container with `left` and `right` original sequences
     * @param step container with current valid indexes
@@ -221,7 +221,7 @@ final class OptimalAlignmentAlignerService[F[_]: Monad: Parallel, Matrix[_], Vec
   /**
     * Consumes `right` token at step's position `j`, setting into sequence `t` at `k`
     *
-    * @param alignment container with `s` and `t` sequences,
+    * @param alignments container with `s` and `t` sequences,
     * representing `left` and `right` aligned sequences, respectively
     * @param sequences container with `left` and `right` original sequences
     * @param step container with current valid indexes
@@ -234,7 +234,7 @@ final class OptimalAlignmentAlignerService[F[_]: Monad: Parallel, Matrix[_], Vec
   /**
     * Skips `left` token at step's position `i`, setting `AlgorithmToken.Empty` on sequence `s` at `k`.
     *
-    * @param alignment container with `s` and `t` sequences,
+    * @param alignments container with `s` and `t` sequences,
     * representing `left` and `right` aligned sequences, respectively
     * @param step container with current valid indexes
     */
@@ -246,7 +246,7 @@ final class OptimalAlignmentAlignerService[F[_]: Monad: Parallel, Matrix[_], Vec
   /**
     * Skips `right` token at step's position `j`, setting `AlgorithmToken.Empty` on sequence `t` at `k`.
     *
-    * @param alignment container with `s` and `t` sequences,
+    * @param alignments container with `s` and `t` sequences,
     * representing `left` and `right` aligned sequences, respectively
     * @param step container with current valid indexes
     */

@@ -22,7 +22,7 @@ object Dependencies {
   val fs2            = "3.0.4"
   val newtype        = "0.4.4"
   val refined        = "0.9.26"
-  val enumeratum     = "1.6.1"
+  val enumeratum     = "1.7.0"
   val breeze         = "1.2"
   val atto           = "0.9.5"
 
@@ -32,7 +32,7 @@ object Dependencies {
 
   // Testing
   val munit           = "0.7.26"
-  val munitCatsEffect = "1.0.3"
+  val munitCatsEffect = "1.0.5"
 
   // Compiler Plugins
   val kindProjector    = "0.11.3"

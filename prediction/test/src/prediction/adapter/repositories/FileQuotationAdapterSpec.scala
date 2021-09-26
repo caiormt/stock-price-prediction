@@ -6,6 +6,8 @@ import munit._
 
 import prediction.domain.entities.quotation._
 
+import natchez.Trace.Implicits._
+
 import java.nio.file._
 
 final class FileQuotationAdapterSpec extends CatsEffectSuite {

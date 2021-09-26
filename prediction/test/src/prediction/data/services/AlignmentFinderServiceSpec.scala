@@ -12,6 +12,7 @@ import prediction.adapter.breeze.algorithm._
 import prediction.adapter.services._
 
 import breeze.linalg._
+import natchez.Trace.Implicits._
 
 final class AlignmentFinderServiceSpec extends CatsEffectSuite {
 

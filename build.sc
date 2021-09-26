@@ -1,6 +1,5 @@
 import mill._
 import mill.scalalib._
-import mill.scalalib.scalafmt._
 
 import $ivy.`com.lihaoyi::mill-contrib-bloop:$MILL_VERSION`
 
@@ -25,6 +24,7 @@ object Dependencies {
   val enumeratum     = "1.7.0"
   val breeze         = "1.2"
   val atto           = "0.9.5"
+  val natchez        = "0.1.5"
 
   // Logging
   val log4cats = "2.1.1"
@@ -62,6 +62,8 @@ object prediction extends ScalaModule with TpolecatModule with StyleModule with 
       ivy"io.chrisdavenport::cats-effect-time:${Dependencies.catsEffectTime}",
       ivy"org.typelevel::kittens:${Dependencies.kittens}",
       ivy"org.typelevel::log4cats-slf4j:${Dependencies.log4cats}",
+      ivy"org.tpolecat::natchez-core:${Dependencies.natchez}",
+      ivy"org.tpolecat::natchez-log:${Dependencies.natchez}",
       ivy"co.fs2::fs2-core:${Dependencies.fs2}",
       ivy"co.fs2::fs2-io:${Dependencies.fs2}",
       ivy"io.estatico::newtype:${Dependencies.newtype}",
@@ -120,7 +122,7 @@ object prediction extends ScalaModule with TpolecatModule with StyleModule with 
         ivy"com.github.liancheng::organize-imports:${Dependencies.organizeImports}"
       )
 
-    override def testFrameworks = Seq("munit.Framework")
+    override def testFramework = "munit.Framework"
   }
 }
 

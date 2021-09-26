@@ -14,13 +14,14 @@ import prediction.adapter.breeze.algorithm._
 import prediction.adapter.services._
 
 import breeze.linalg._
+import natchez.Trace.Implicits._
 
 import java.{ time => jt }
 
 final class QuotationAlignerServiceSpec extends CatsEffectSuite {
 
   private val service = Eval.later {
-    val parser    = new AlgorithmParserService[IO]
+    val parser    = new AlgorithmParserService3[IO]
     val matrix    = new BreezeMatrixAdapter[IO, AlgorithmScore]
     val vector    = new BreezeVectorAdapter[IO, AlgorithmToken]
     val score     = new ScoreCalculatorService[IO]

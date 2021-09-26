@@ -13,6 +13,7 @@ import prediction.adapter.breeze.algorithm._
 import prediction.adapter.services._
 
 import breeze.linalg.{ DenseMatrix, DenseVector }
+import natchez.Trace.Implicits._
 
 final class OptimalAlignmentAlignerServiceSpec extends CatsEffectSuite {
 
@@ -44,15 +45,15 @@ final class OptimalAlignmentAlignerServiceSpec extends CatsEffectSuite {
     val left  = AlgorithmSequence(
       Vector(
         AlgorithmToken(Draw),
-        AlgorithmToken(Positive),
-        AlgorithmToken(Negative)
+        AlgorithmToken(Positive1),
+        AlgorithmToken(Negative1)
       )
     )
     val right = AlgorithmSequence(
       Vector(
-        AlgorithmToken(Negative),
-        AlgorithmToken(Negative),
-        AlgorithmToken(Negative)
+        AlgorithmToken(Negative1),
+        AlgorithmToken(Negative1),
+        AlgorithmToken(Negative1)
       )
     )
 
@@ -75,22 +76,22 @@ final class OptimalAlignmentAlignerServiceSpec extends CatsEffectSuite {
     val left  = AlgorithmSequence(
       Vector(
         AlgorithmToken(Draw),
-        AlgorithmToken(Positive),
-        AlgorithmToken(Negative)
+        AlgorithmToken(Positive1),
+        AlgorithmToken(Negative1)
       )
     )
     val right = AlgorithmSequence(
       Vector(
-        AlgorithmToken(Negative),
-        AlgorithmToken(Negative),
-        AlgorithmToken(Negative)
+        AlgorithmToken(Negative1),
+        AlgorithmToken(Negative1),
+        AlgorithmToken(Negative1)
       )
     )
 
     val result = AlgorithmSequence(
       Vector(
-        AlgorithmToken(Negative),
-        AlgorithmToken(Positive),
+        AlgorithmToken(Negative1),
+        AlgorithmToken(Positive1),
         AlgorithmToken.Empty
       )
     )
@@ -110,29 +111,29 @@ final class OptimalAlignmentAlignerServiceSpec extends CatsEffectSuite {
   test("should build best alignments when both sequences are different") {
     val left  = AlgorithmSequence(
       Vector(
-        AlgorithmToken(Positive),
-        AlgorithmToken(Positive),
-        AlgorithmToken(Positive)
+        AlgorithmToken(Positive1),
+        AlgorithmToken(Positive1),
+        AlgorithmToken(Positive1)
       )
     )
     val right = AlgorithmSequence(
       Vector(
-        AlgorithmToken(Negative),
-        AlgorithmToken(Negative),
-        AlgorithmToken(Negative)
+        AlgorithmToken(Negative1),
+        AlgorithmToken(Negative1),
+        AlgorithmToken(Negative1)
       )
     )
 
     val leftResult  = Vector(
-      AlgorithmToken(Positive),
-      AlgorithmToken(Positive),
-      AlgorithmToken(Positive),
+      AlgorithmToken(Positive1),
+      AlgorithmToken(Positive1),
+      AlgorithmToken(Positive1),
       AlgorithmToken.Empty
     )
     val rightResult = Vector(
-      AlgorithmToken(Negative),
-      AlgorithmToken(Negative),
-      AlgorithmToken(Negative),
+      AlgorithmToken(Negative1),
+      AlgorithmToken(Negative1),
+      AlgorithmToken(Negative1),
       AlgorithmToken.Empty
     )
 
@@ -150,25 +151,25 @@ final class OptimalAlignmentAlignerServiceSpec extends CatsEffectSuite {
   test("should build best alignments when sequences has partial match") {
     val left  = AlgorithmSequence(
       Vector(
-        AlgorithmToken(Negative),
-        AlgorithmToken(Negative),
-        AlgorithmToken(Positive),
-        AlgorithmToken(Positive),
-        AlgorithmToken(Positive)
+        AlgorithmToken(Negative1),
+        AlgorithmToken(Negative1),
+        AlgorithmToken(Positive1),
+        AlgorithmToken(Positive1),
+        AlgorithmToken(Positive1)
       )
     )
     val right = AlgorithmSequence(
       Vector(
-        AlgorithmToken(Negative),
-        AlgorithmToken(Positive),
-        AlgorithmToken(Positive)
+        AlgorithmToken(Negative1),
+        AlgorithmToken(Positive1),
+        AlgorithmToken(Positive1)
       )
     )
 
     val result = Vector(
-      AlgorithmToken(Positive),
-      AlgorithmToken(Positive),
-      AlgorithmToken(Negative),
+      AlgorithmToken(Positive1),
+      AlgorithmToken(Positive1),
+      AlgorithmToken(Negative1),
       AlgorithmToken.Empty
     )
 
@@ -186,23 +187,23 @@ final class OptimalAlignmentAlignerServiceSpec extends CatsEffectSuite {
   test("should build best alignments when both sequences are equals") {
     val left  = AlgorithmSequence(
       Vector(
-        AlgorithmToken(Positive),
-        AlgorithmToken(Positive),
-        AlgorithmToken(Positive)
+        AlgorithmToken(Positive1),
+        AlgorithmToken(Positive1),
+        AlgorithmToken(Positive1)
       )
     )
     val right = AlgorithmSequence(
       Vector(
-        AlgorithmToken(Positive),
-        AlgorithmToken(Positive),
-        AlgorithmToken(Positive)
+        AlgorithmToken(Positive1),
+        AlgorithmToken(Positive1),
+        AlgorithmToken(Positive1)
       )
     )
 
     val result = Vector(
-      AlgorithmToken(Positive),
-      AlgorithmToken(Positive),
-      AlgorithmToken(Positive),
+      AlgorithmToken(Positive1),
+      AlgorithmToken(Positive1),
+      AlgorithmToken(Positive1),
       AlgorithmToken.Empty
     )
 
@@ -220,26 +221,26 @@ final class OptimalAlignmentAlignerServiceSpec extends CatsEffectSuite {
   test("should consume remaining tokens from right sequence") {
     val left  = AlgorithmSequence(
       Vector(
-        AlgorithmToken(Negative),
-        AlgorithmToken(Negative),
-        AlgorithmToken(Positive),
-        AlgorithmToken(Positive)
+        AlgorithmToken(Negative1),
+        AlgorithmToken(Negative1),
+        AlgorithmToken(Positive1),
+        AlgorithmToken(Positive1)
       )
     )
     val right = AlgorithmSequence(
       Vector(
-        AlgorithmToken(Negative),
-        AlgorithmToken(Positive),
-        AlgorithmToken(Positive),
-        AlgorithmToken(Negative)
+        AlgorithmToken(Negative1),
+        AlgorithmToken(Positive1),
+        AlgorithmToken(Positive1),
+        AlgorithmToken(Negative1)
       )
     )
 
     val result = Vector(
-      AlgorithmToken(Negative),
-      AlgorithmToken(Positive),
-      AlgorithmToken(Positive),
-      AlgorithmToken(Negative)
+      AlgorithmToken(Negative1),
+      AlgorithmToken(Positive1),
+      AlgorithmToken(Positive1),
+      AlgorithmToken(Negative1)
     )
     val empty  = Vector.fill(4)(AlgorithmToken.Empty)
 
@@ -256,26 +257,26 @@ final class OptimalAlignmentAlignerServiceSpec extends CatsEffectSuite {
   test("should consume remaining tokens from left sequence") {
     val left  = AlgorithmSequence(
       Vector(
-        AlgorithmToken(Negative),
-        AlgorithmToken(Negative),
-        AlgorithmToken(Positive),
-        AlgorithmToken(Positive)
+        AlgorithmToken(Negative1),
+        AlgorithmToken(Negative1),
+        AlgorithmToken(Positive1),
+        AlgorithmToken(Positive1)
       )
     )
     val right = AlgorithmSequence(
       Vector(
-        AlgorithmToken(Negative),
-        AlgorithmToken(Positive),
-        AlgorithmToken(Positive),
-        AlgorithmToken(Negative)
+        AlgorithmToken(Negative1),
+        AlgorithmToken(Positive1),
+        AlgorithmToken(Positive1),
+        AlgorithmToken(Negative1)
       )
     )
 
     val result = Vector(
-      AlgorithmToken(Positive),
-      AlgorithmToken(Positive),
-      AlgorithmToken(Negative),
-      AlgorithmToken(Negative)
+      AlgorithmToken(Positive1),
+      AlgorithmToken(Positive1),
+      AlgorithmToken(Negative1),
+      AlgorithmToken(Negative1)
     )
     val empty  = Vector.fill(4)(AlgorithmToken.Empty)
 
@@ -292,28 +293,28 @@ final class OptimalAlignmentAlignerServiceSpec extends CatsEffectSuite {
   test("should build sequence alignment reversing and taking K elements only") {
     val left  = AlgorithmSequence(
       Vector(
-        AlgorithmToken(Positive),
+        AlgorithmToken(Positive1),
         AlgorithmToken(Draw),
-        AlgorithmToken(Negative)
+        AlgorithmToken(Negative1)
       )
     )
     val right = AlgorithmSequence(
       Vector(
-        AlgorithmToken(Positive),
-        AlgorithmToken(Positive),
-        AlgorithmToken(Negative)
+        AlgorithmToken(Positive1),
+        AlgorithmToken(Positive1),
+        AlgorithmToken(Negative1)
       )
     )
 
     for {
       service    <- IO(service.value)
       alignments <- service.createEmptyAlignments(5)
-      _          <- vector.value.set(alignments.s, 0, AlgorithmToken(Negative))
-      _          <- vector.value.set(alignments.t, 0, AlgorithmToken(Negative))
+      _          <- vector.value.set(alignments.s, 0, AlgorithmToken(Negative1))
+      _          <- vector.value.set(alignments.t, 0, AlgorithmToken(Negative1))
       _          <- vector.value.set(alignments.s, 1, AlgorithmToken(Draw))
-      _          <- vector.value.set(alignments.t, 1, AlgorithmToken(Positive))
-      _          <- vector.value.set(alignments.s, 2, AlgorithmToken(Positive))
-      _          <- vector.value.set(alignments.t, 2, AlgorithmToken(Positive))
+      _          <- vector.value.set(alignments.t, 1, AlgorithmToken(Positive1))
+      _          <- vector.value.set(alignments.s, 2, AlgorithmToken(Positive1))
+      _          <- vector.value.set(alignments.t, 2, AlgorithmToken(Positive1))
       alignment  <- service.buildSequenceAlignment(alignments)(AlgorithmStep(0, 0, k = 3))
     } yield assertEquals(alignment.left -> alignment.right, left -> right)
   }
@@ -322,29 +323,29 @@ final class OptimalAlignmentAlignerServiceSpec extends CatsEffectSuite {
     for {
       service    <- IO(service.value)
       alignments <- service.createEmptyAlignments(1)
-      _          <- vector.value.set(alignments.s, 0, AlgorithmToken(Negative))
-      _          <- vector.value.set(alignments.t, 0, AlgorithmToken(Negative))
+      _          <- vector.value.set(alignments.s, 0, AlgorithmToken(Negative1))
+      _          <- vector.value.set(alignments.t, 0, AlgorithmToken(Negative1))
       _          <- service.skipLeft(alignments, AlgorithmStep(1, 1))
       left       <- vector.value.get(alignments.s, 0)
       right      <- vector.value.get(alignments.t, 0)
-    } yield assertEquals(left -> right, AlgorithmToken.Empty -> AlgorithmToken(Negative))
+    } yield assertEquals(left -> right, AlgorithmToken.Empty -> AlgorithmToken(Negative1))
   }
 
   test("should skip right sequence") {
     for {
       service    <- IO(service.value)
       alignments <- service.createEmptyAlignments(1)
-      _          <- vector.value.set(alignments.s, 0, AlgorithmToken(Negative))
-      _          <- vector.value.set(alignments.t, 0, AlgorithmToken(Negative))
+      _          <- vector.value.set(alignments.s, 0, AlgorithmToken(Negative1))
+      _          <- vector.value.set(alignments.t, 0, AlgorithmToken(Negative1))
       _          <- service.skipRight(alignments, AlgorithmStep(1, 1))
       left       <- vector.value.get(alignments.s, 0)
       right      <- vector.value.get(alignments.t, 0)
-    } yield assertEquals(left -> right, AlgorithmToken(Negative) -> AlgorithmToken.Empty)
+    } yield assertEquals(left -> right, AlgorithmToken(Negative1) -> AlgorithmToken.Empty)
   }
 
   test("should advance left sequence") {
     val left  = AlgorithmSequence(Vector(AlgorithmToken(Draw)))
-    val right = AlgorithmSequence(Vector(AlgorithmToken(Negative)))
+    val right = AlgorithmSequence(Vector(AlgorithmToken(Negative1)))
     for {
       service    <- IO(service.value)
       alignments <- service.createEmptyAlignments(1)
@@ -357,7 +358,7 @@ final class OptimalAlignmentAlignerServiceSpec extends CatsEffectSuite {
 
   test("should advance right sequence") {
     val left  = AlgorithmSequence(Vector(AlgorithmToken(Draw)))
-    val right = AlgorithmSequence(Vector(AlgorithmToken(Negative)))
+    val right = AlgorithmSequence(Vector(AlgorithmToken(Negative1)))
     for {
       service    <- IO(service.value)
       alignments <- service.createEmptyAlignments(1)
@@ -365,12 +366,12 @@ final class OptimalAlignmentAlignerServiceSpec extends CatsEffectSuite {
       _          <- service.advanceRight(alignments, sequences, AlgorithmStep(1, 1))
       left       <- vector.value.get(alignments.s, 0)
       right      <- vector.value.get(alignments.t, 0)
-    } yield assertEquals(left -> right, AlgorithmToken.Empty -> AlgorithmToken(Negative))
+    } yield assertEquals(left -> right, AlgorithmToken.Empty -> AlgorithmToken(Negative1))
   }
 
   test("should consume up") {
     val left  = AlgorithmSequence(Vector(AlgorithmToken(Draw)))
-    val right = AlgorithmSequence(Vector(AlgorithmToken(Negative)))
+    val right = AlgorithmSequence(Vector(AlgorithmToken(Negative1)))
     for {
       service    <- IO(service.value)
       alignments <- service.createEmptyAlignments(1)
@@ -383,7 +384,7 @@ final class OptimalAlignmentAlignerServiceSpec extends CatsEffectSuite {
 
   test("should consume left") {
     val left  = AlgorithmSequence(Vector(AlgorithmToken(Draw)))
-    val right = AlgorithmSequence(Vector(AlgorithmToken(Negative)))
+    val right = AlgorithmSequence(Vector(AlgorithmToken(Negative1)))
     for {
       service    <- IO(service.value)
       alignments <- service.createEmptyAlignments(1)
@@ -391,12 +392,12 @@ final class OptimalAlignmentAlignerServiceSpec extends CatsEffectSuite {
       step       <- service.consumeLeft(alignments, sequences)(AlgorithmStep(1, 1))
       left       <- vector.value.get(alignments.s, 0)
       right      <- vector.value.get(alignments.t, 0)
-    } yield assertEquals((left, right, step), (AlgorithmToken.Empty, AlgorithmToken(Negative), AlgorithmStep(1, 0, 1)))
+    } yield assertEquals((left, right, step), (AlgorithmToken.Empty, AlgorithmToken(Negative1), AlgorithmStep(1, 0, 1)))
   }
 
   test("should consume upLeft") {
     val left  = AlgorithmSequence(Vector(AlgorithmToken(Draw)))
-    val right = AlgorithmSequence(Vector(AlgorithmToken(Negative)))
+    val right = AlgorithmSequence(Vector(AlgorithmToken(Negative1)))
     for {
       service    <- IO(service.value)
       alignments <- service.createEmptyAlignments(1)
@@ -404,6 +405,6 @@ final class OptimalAlignmentAlignerServiceSpec extends CatsEffectSuite {
       step       <- service.consumeUpLeft(alignments, sequences)(AlgorithmStep(1, 1))
       left       <- vector.value.get(alignments.s, 0)
       right      <- vector.value.get(alignments.t, 0)
-    } yield assertEquals((left, right, step), (AlgorithmToken(Draw), AlgorithmToken(Negative), AlgorithmStep(0, 0, 1)))
+    } yield assertEquals((left, right, step), (AlgorithmToken(Draw), AlgorithmToken(Negative1), AlgorithmStep(0, 0, 1)))
   }
 }

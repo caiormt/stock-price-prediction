@@ -15,13 +15,14 @@ import prediction.adapter.breeze.algorithm._
 import prediction.adapter.services._
 
 import breeze.linalg._
+import natchez.Trace.Implicits._
 
 import java.{ time => jt }
 
 final class QuotationPredictorServiceSpec extends CatsEffectSuite {
 
   private val service = Eval.later {
-    val algorithmParser  = new AlgorithmParserService[IO]
+    val algorithmParser  = new AlgorithmParserService3[IO]
     val score            = new ScoreCalculatorService[IO]
     val matrix           = new BreezeMatrixAdapter[IO, AlgorithmScore]
     val alignment        = new AlignmentFinderService[IO, DenseMatrix](matrix)
@@ -50,7 +51,7 @@ final class QuotationPredictorServiceSpec extends CatsEffectSuite {
 
     val result = service.value.predict(actual, reference)
 
-    assertIO(result, Alphabet.Positive.some)
+    assertIO(result, Alphabet.Positive1.some)
   }
 
   test("should return none when does not have prediction") {

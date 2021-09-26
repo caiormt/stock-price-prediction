@@ -16,7 +16,27 @@
       <PatternLayout pattern="${LOG_PATTERN}" noConsoleNoAnsi="true" />
     </Console>
 
+    <Console name="TRACE_STD_OUT" target="SYSTEM_OUT" follow="true">
+      <PatternLayout pattern="%m%n" noConsoleNoAnsi="true" />
+    </Console>
+
     <RollingFile name="FILE_APPENDER" fileName="${sys:user.dir}/log/core.log" filePattern="${sys:user.dir}/log/core.%d{yyyyMMdd}-%d{HH}.log" ignoreExceptions="false">
+      <PatternLayout pattern="${LOG_PATTERN}" />
+      <Policies>
+        <TimeBasedTriggeringPolicy interval="1" modulate="true" />
+      </Policies>
+      <DefaultRolloverStrategy max="20" />
+    </RollingFile>
+
+    <RollingFile name="TRACE_FILE" fileName="${sys:user.dir}/log/trace.log" filePattern="${sys:user.dir}/log/trace.%d{yyyyMMdd}-%d{HH}.log" ignoreExceptions="false">
+      <PatternLayout pattern="%m%n" />
+      <Policies>
+        <TimeBasedTriggeringPolicy interval="1" modulate="true" />
+      </Policies>
+      <DefaultRolloverStrategy max="20" />
+    </RollingFile>
+
+    <RollingFile name="EXCEL_FILE" fileName="${sys:user.dir}/log/report.log" filePattern="${sys:user.dir}/log/report.%d{yyyyMMdd}-%d{HH}.log" ignoreExceptions="false">
       <PatternLayout pattern="%m%n" />
       <Policies>
         <TimeBasedTriggeringPolicy interval="1" modulate="true" />
@@ -27,12 +47,14 @@
 
   <!-- Loggers -->
   <Loggers>
-    <Logger name="prediction" level="${LOG_LEVEL}" additivity="false">
-      <AppenderRef ref="FILE_APPENDER" />
+    <Logger name="trace" level="${LOG_LEVEL}" additivity="false">
+      <AppenderRef ref="TRACE_STD_OUT" />
+      <AppenderRef ref="TRACE_FILE" />
     </Logger>
 
-    <Logger name="console" level="${LOG_LEVEL}" additivity="false">
+    <Logger name="report" level="${LOG_LEVEL}" additivity="false">
       <AppenderRef ref="STD_OUT" />
+      <AppenderRef ref="EXCEL_FILE" />
     </Logger>
 
     <Root level="${ROOT_LOG_LEVEL}">

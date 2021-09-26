@@ -14,7 +14,7 @@ import java.{ time => jt }
 
 final class AlgorithmParserServiceSpec extends CatsEffectSuite {
 
-  private val service = Eval.later(new AlgorithmParserService[IO])
+  private val service = Eval.later(new AlgorithmParserService3[IO])
 
   test("should return Draw when opening and closing price are equals") {
     val quotation = Quotation(
@@ -39,7 +39,7 @@ final class AlgorithmParserServiceSpec extends CatsEffectSuite {
 
     val result = service.value.parse(quotation)
 
-    assertIO(result, AlgorithmToken(Alphabet.Negative))
+    assertIO(result, AlgorithmToken(Alphabet.Negative1))
   }
 
   test("should return Positive when opening is lesser than closing price") {
@@ -52,6 +52,6 @@ final class AlgorithmParserServiceSpec extends CatsEffectSuite {
 
     val result = service.value.parse(quotation)
 
-    assertIO(result, AlgorithmToken(Alphabet.Positive))
+    assertIO(result, AlgorithmToken(Alphabet.Positive1))
   }
 }

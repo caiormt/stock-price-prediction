@@ -22,8 +22,8 @@ final class AlgorithmSpec extends CatsEffectSuite {
   test("AlgorithmToken.show should use Alphabet.show") {
     assertEquals(AlgorithmToken(Empty).show, Empty.value.show)
     assertEquals(AlgorithmToken(Draw).show, Draw.value.show)
-    assertEquals(AlgorithmToken(Positive).show, Positive.value.show)
-    assertEquals(AlgorithmToken(Negative).show, Negative.value.show)
+    assertEquals(AlgorithmToken(Positive1).show, Positive1.value.show)
+    assertEquals(AlgorithmToken(Negative1).show, Negative1.value.show)
   }
 
   // ----- AlgorithmSequence
@@ -36,8 +36,8 @@ final class AlgorithmSpec extends CatsEffectSuite {
     val sequence = AlgorithmSequence(
       Vector(
         AlgorithmToken(Draw),
-        AlgorithmToken(Positive),
-        AlgorithmToken(Negative)
+        AlgorithmToken(Positive1),
+        AlgorithmToken(Negative1)
       )
     )
 
@@ -49,8 +49,8 @@ final class AlgorithmSpec extends CatsEffectSuite {
     val sequence = AlgorithmSequence(
       Vector(
         AlgorithmToken(Draw),
-        AlgorithmToken(Positive),
-        AlgorithmToken(Negative)
+        AlgorithmToken(Positive1),
+        AlgorithmToken(Negative1)
       )
     )
     assertEquals(sequence.size, 3)
@@ -60,14 +60,14 @@ final class AlgorithmSpec extends CatsEffectSuite {
     val sequence = AlgorithmSequence(
       Vector(
         AlgorithmToken(Draw),
-        AlgorithmToken(Positive),
-        AlgorithmToken(Negative)
+        AlgorithmToken(Positive1),
+        AlgorithmToken(Negative1)
       )
     )
     intercept[IndexOutOfBoundsException](sequence.at(0))
     assertEquals(sequence.at(1), AlgorithmToken(Draw))
-    assertEquals(sequence.at(2), AlgorithmToken(Positive))
-    assertEquals(sequence.at(3), AlgorithmToken(Negative))
+    assertEquals(sequence.at(2), AlgorithmToken(Positive1))
+    assertEquals(sequence.at(3), AlgorithmToken(Negative1))
     intercept[IndexOutOfBoundsException](sequence.at(4))
   }
 
@@ -75,14 +75,14 @@ final class AlgorithmSpec extends CatsEffectSuite {
     val sequence = AlgorithmSequence(
       Vector(
         AlgorithmToken(Draw),
-        AlgorithmToken(Positive),
-        AlgorithmToken(Negative)
+        AlgorithmToken(Positive1),
+        AlgorithmToken(Negative1)
       )
     )
     assertEquals(sequence.liftAt(0), none)
     assertEquals(sequence.liftAt(1), AlgorithmToken(Draw).some)
-    assertEquals(sequence.liftAt(2), AlgorithmToken(Positive).some)
-    assertEquals(sequence.liftAt(3), AlgorithmToken(Negative).some)
+    assertEquals(sequence.liftAt(2), AlgorithmToken(Positive1).some)
+    assertEquals(sequence.liftAt(3), AlgorithmToken(Negative1).some)
     assertEquals(sequence.liftAt(4), none)
   }
 

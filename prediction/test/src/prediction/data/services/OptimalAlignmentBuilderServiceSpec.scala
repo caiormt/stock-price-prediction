@@ -13,6 +13,7 @@ import prediction.adapter.breeze.algorithm._
 import prediction.adapter.services._
 
 import breeze.linalg._
+import natchez.Trace.Implicits._
 
 final class OptimalAlignmentBuilderServiceSpec extends CatsEffectSuite {
 
@@ -26,8 +27,8 @@ final class OptimalAlignmentBuilderServiceSpec extends CatsEffectSuite {
     val sequence = AlgorithmSequence(
       scala.collection.immutable.Vector(
         AlgorithmToken(Draw),
-        AlgorithmToken(Positive),
-        AlgorithmToken(Negative)
+        AlgorithmToken(Positive1),
+        AlgorithmToken(Negative1)
       )
     )
 
@@ -49,16 +50,16 @@ final class OptimalAlignmentBuilderServiceSpec extends CatsEffectSuite {
   test("should fill matrix when both are different") {
     val leftSequence  = AlgorithmSequence(
       scala.collection.immutable.Vector(
-        AlgorithmToken(Positive),
-        AlgorithmToken(Positive),
-        AlgorithmToken(Positive)
+        AlgorithmToken(Positive1),
+        AlgorithmToken(Positive1),
+        AlgorithmToken(Positive1)
       )
     )
     val rightSequence = AlgorithmSequence(
       scala.collection.immutable.Vector(
-        AlgorithmToken(Negative),
-        AlgorithmToken(Negative),
-        AlgorithmToken(Negative)
+        AlgorithmToken(Negative1),
+        AlgorithmToken(Negative1),
+        AlgorithmToken(Negative1)
       )
     )
 
@@ -80,16 +81,16 @@ final class OptimalAlignmentBuilderServiceSpec extends CatsEffectSuite {
   test("should fill matrix when both are equals") {
     val leftSequence  = AlgorithmSequence(
       scala.collection.immutable.Vector(
-        AlgorithmToken(Positive),
-        AlgorithmToken(Positive),
-        AlgorithmToken(Positive)
+        AlgorithmToken(Positive1),
+        AlgorithmToken(Positive1),
+        AlgorithmToken(Positive1)
       )
     )
     val rightSequence = AlgorithmSequence(
       scala.collection.immutable.Vector(
-        AlgorithmToken(Positive),
-        AlgorithmToken(Positive),
-        AlgorithmToken(Positive)
+        AlgorithmToken(Positive1),
+        AlgorithmToken(Positive1),
+        AlgorithmToken(Positive1)
       )
     )
 
@@ -111,16 +112,16 @@ final class OptimalAlignmentBuilderServiceSpec extends CatsEffectSuite {
   test("should completly build matrix when both are different") {
     val leftSequence  = AlgorithmSequence(
       scala.collection.immutable.Vector(
-        AlgorithmToken(Positive),
-        AlgorithmToken(Positive),
-        AlgorithmToken(Positive)
+        AlgorithmToken(Positive1),
+        AlgorithmToken(Positive1),
+        AlgorithmToken(Positive1)
       )
     )
     val rightSequence = AlgorithmSequence(
       scala.collection.immutable.Vector(
-        AlgorithmToken(Negative),
-        AlgorithmToken(Negative),
-        AlgorithmToken(Negative)
+        AlgorithmToken(Negative1),
+        AlgorithmToken(Negative1),
+        AlgorithmToken(Negative1)
       )
     )
 
@@ -141,16 +142,16 @@ final class OptimalAlignmentBuilderServiceSpec extends CatsEffectSuite {
   test("should completly build matrix when both are equals") {
     val leftSequence  = AlgorithmSequence(
       scala.collection.immutable.Vector(
-        AlgorithmToken(Positive),
-        AlgorithmToken(Positive),
-        AlgorithmToken(Positive)
+        AlgorithmToken(Positive1),
+        AlgorithmToken(Positive1),
+        AlgorithmToken(Positive1)
       )
     )
     val rightSequence = AlgorithmSequence(
       scala.collection.immutable.Vector(
-        AlgorithmToken(Positive),
-        AlgorithmToken(Positive),
-        AlgorithmToken(Positive)
+        AlgorithmToken(Positive1),
+        AlgorithmToken(Positive1),
+        AlgorithmToken(Positive1)
       )
     )
 

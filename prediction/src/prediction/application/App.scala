@@ -11,6 +11,9 @@ import fs2.text
 
 import io.chrisdavenport.cats.time._
 
+import org.typelevel.log4cats._
+import org.typelevel.log4cats.slf4j._
+
 import prediction.domain.entities._
 import prediction.domain.entities.algorithm._
 import prediction.domain.entities.quotation._
@@ -25,182 +28,171 @@ import prediction.adapter.repositories.models.b3._
 import prediction.adapter.repositories.parsers.b3._
 import prediction.adapter.services._
 
-import org.typelevel.log4cats.slf4j._
+import natchez.TraceValue._
+import natchez._
+import natchez.log._
 
 import java.nio.file._
 import java.{ time => jt }
 
 object App extends IOApp.Simple {
 
-  final type Filter           = Quotation => Boolean
-  final type Quotations[F[_]] = F[Vector[Quotation]]
-
-  final private val logger =
-    Slf4jLogger.getLoggerFromName[IO]("prediction")
-
-  final private val console =
-    Slf4jLogger.getLoggerFromName[IO]("console")
+  final type Filter                = Quotation => Boolean
+  final type Quotations[F[_]]      = F[Vector[Quotation]]
+  final type AlgorithmParser[F[_]] = AlgorithmParserUseCase[F, Quotation, AlgorithmToken]
 
   override def run: IO[Unit] =
-    load[IO]("COTAHIST_BOVA11.txt").memoize.flatMap { quotations =>
-      // format: off
-      testOn(2020, quotations) *>
-      testOn(2019, quotations) *>
-      testOn(2018, quotations) *>
-      testOn(2017, quotations) *>
-      testOn(2016, quotations) *>
-      testOn(2015, quotations) *>
-      testOn(2014, quotations) *>
-      testOn(2013, quotations) *>
-      testOn(2012, quotations) *>
-      testOn(2011, quotations)
-      // format: on
+    Slf4jLogger.fromName[IO]("trace").flatMap { implicit logger =>
+      Log.entryPoint[IO]("prediction").root("run").use { root =>
+        Trace.ioTrace(root).flatMap { implicit trace =>
+          application[IO]
+        }
+      }
     }
 
-  def testOn(year: Int, quotations: Quotations[IO]): IO[Unit] =
+  def application[F[_]: Async: Trace]: F[Unit] = {
+    def run(quotations: Quotations[F])(implicit logger: Logger[F], algorithmParser: AlgorithmParser[F]) =
+      // format: off
+      testCase[F](2020, quotations) *>
+      testCase[F](2019, quotations) *>
+      testCase[F](2018, quotations) *>
+      testCase[F](2017, quotations) *>
+      testCase[F](2016, quotations) *>
+      testCase[F](2015, quotations) *>
+      testCase[F](2014, quotations) *>
+      testCase[F](2013, quotations) *>
+      testCase[F](2012, quotations) *>
+      testCase[F](2011, quotations)
+      // format: on
+
+    def go(variance: BigDecimal, quotations: Quotations[F])(implicit logger: Logger[F]) =
+      // format: off
+      logger.info(show"Alfabeto 3  - Variação $variance") *>
+        Sync[F].delay(new AlgorithmParserService3[F]).flatMap(implicit algorithmParser => run(quotations)) *>
+      logger.info(show"\n\nAlfabeto 5  - Variação $variance") *>
+        Sync[F].delay(new AlgorithmParserService5[F](variance)).flatMap(implicit algorithmParser => run(quotations)) *>
+      logger.info(show"\n\nAlfabeto 7  - Variação $variance") *>
+        Sync[F].delay(new AlgorithmParserService7[F](variance)).flatMap(implicit algorithmParser => run(quotations)) *>
+      logger.info(show"\n\nAlfabeto 9  - Variação $variance") *>
+        Sync[F].delay(new AlgorithmParserService9[F](variance)).flatMap(implicit algorithmParser => run(quotations)) *>
+      logger.info(show"\n\nAlfabeto 11 - Variação $variance") *>
+        Sync[F].delay(new AlgorithmParserService11[F](variance)).flatMap(implicit algorithmParser => run(quotations))
+      // format: on
+
+    load[F]("COTAHIST_BOVA11.txt").memoize.flatMap { quotations =>
+      Slf4jLogger.fromName[F]("report").flatMap { implicit logger =>
+        // format: off
+        go(0.2, quotations) *>
+        go(0.5, quotations) *>
+        go(1.0, quotations) *>
+        go(5.0, quotations) *>
+        go(10.0, quotations)
+        // format: on
+      }
+    }
+  }
+
+  def testCase[F[_]: Async: Logger: Trace: AlgorithmParser](year: Int, quotations: Quotations[F]): F[Unit] =
     // format: off
-        monthlyYear2(quotations, year, year - 1) *>
-       biweeklyYear2(quotations, year, year - 1) *>
-         weeklyYear2(quotations, year, year - 1) *>
-    goldenNumberYear(quotations, year, year - 1) *>
-       biweeklyYear3(quotations, year, year - 1) *>
-    logger.info("") *> console.info("")
+         monthlyYear(quotations, year, year - 1) *>
+        biweeklyYear(quotations, year, year - 1) *>
+          weeklyYear(quotations, year, year - 1) *>
+    goldenNumberYear(quotations, year, year - 1)
     // format: on
 
   // -----
 
-  def monthlyYear(quotations: Quotations[IO], actual: Int, reference: Int): IO[Unit] =
-    for {
-      _       <- console.info(show"Predicting with 1 month of $actual in $reference")
-      guesses <- (1 to 12).toList
-                   .parTraverse { month =>
-                     application[IO](quotations, monthFilter(month, actual), yearFilter(reference))
-                   }
-                   .nested
-                   .filter(identity)
-                   .value
-                   .map(_.size)
-      _       <- console.info(show"Guessed $guesses correctly out of 12")
-    } yield ()
+  def monthlyYear[F[_]: Async: Logger: Trace: AlgorithmParser](
+      quotations: Quotations[F],
+      actual: Int,
+      reference: Int): F[Unit] =
+    Trace[F].span("monthly") {
+      for {
+        _                <- Trace[F].put(("actual", actual), ("reference", reference))
+        result           <- quotations.flatMap { quotations =>
+                              (1 to 12).toList
+                                .parTraverse { month =>
+                                  val actualQuotations = quotations.filter(monthFilter(month, actual))
+                                  application[F](quotations.pure[F], actualQuotations.pure[F], upToYearFilter(reference))
+                                }
+                            }
+        (guesses, total) <- Applicative[F].pure(result.count(identity) -> result.size)
+        _                <- Trace[F].put(("total", total), ("guesses", guesses))
+        _                <- Logger[F].info(show"2010 até $actual\tMeses de $reference\t$total\t$guesses")
+      } yield ()
+    }
 
-  def monthlyYear2(quotations: Quotations[IO], actual: Int, reference: Int): IO[Unit] =
-    for {
-      _       <- console.info(show"Predicting with 1 month of $actual in $reference")
-      guesses <- (1 to 12).toList
-                   .parTraverse { month =>
-                     application[IO](quotations, monthFilter(month, actual), upToYearFilter(reference))
-                   }
-                   .nested
-                   .filter(identity)
-                   .value
-                   .map(_.size)
-      _       <- logger.info(show"2010 até $actual\tMeses de $reference\t12\t$guesses")
-      _       <- console.info(show"Guessed $guesses correctly out of 12")
-    } yield ()
+  def biweeklyYear[F[_]: Async: Logger: Trace: AlgorithmParser](
+      quotations: Quotations[F],
+      actual: Int,
+      reference: Int
+  ): F[Unit] =
+    Trace[F].span("biweekly") {
+      for {
+        _                <- Trace[F].put(("actual", actual), ("reference", reference))
+        result           <- quotations.flatMap { quotations =>
+                              quotations
+                                .filter(yearFilter(actual))
+                                .sliding(10, 10)
+                                .filter(_.size === 10)
+                                .toList
+                                .parTraverse { actual =>
+                                  application[F](quotations.pure[F], actual.pure[F], upToYearFilter(reference))
+                                }
+                            }
+        (guesses, total) <- Applicative[F].pure(result.count(identity) -> result.size)
+        _                <- Trace[F].put(("total", total), ("guesses", guesses))
+        _                <- Logger[F].info(show"2010 até $actual\tJanela 10 dias de $reference\t$total\t$guesses")
+      } yield ()
+    }
 
-  def biweeklyYear(quotations: Quotations[IO], actual: Int, reference: Int): IO[Unit] =
-    for {
-      _       <- console.info(show"Predicting with 14 days of $actual in $reference")
-      guesses <- (1 to 12).toList
-                   .parFlatTraverse { month =>
-                     (0 to 1).toList.parTraverse { week =>
-                       application[IO](quotations, biweeklyFilter(week, month, actual), yearFilter(reference))
-                     }
-                   }
-                   .nested
-                   .filter(identity)
-                   .value
-                   .map(_.size)
-      _       <- console.info(show"Guessed $guesses correctly out of 12")
-    } yield ()
+  def weeklyYear[F[_]: Async: Logger: Trace: AlgorithmParser](
+      quotations: Quotations[F],
+      actual: Int,
+      reference: Int
+  ): F[Unit] =
+    Trace[F].span("weekly") {
+      for {
+        _                <- Trace[F].put(("actual", actual), ("reference", reference))
+        result           <- quotations.flatMap { quotations =>
+                              quotations
+                                .filter(yearFilter(actual))
+                                .sliding(5, 5)
+                                .filter(_.size === 5)
+                                .toList
+                                .parTraverse { actual =>
+                                  application[F](quotations.pure[F], actual.pure[F], upToYearFilter(reference))
+                                }
+                            }
+        (guesses, total) <- Applicative[F].pure(result.count(identity) -> result.size)
+        _                <- Trace[F].put(("total", total), ("guesses", guesses))
+        _                <- Logger[F].info(show"2010 até $actual\tJanela 5 dias de $reference\t$total\t$guesses")
+      } yield ()
+    }
 
-  def biweeklyYear2(quotations: Quotations[IO], actual: Int, reference: Int): IO[Unit] =
-    for {
-      _                <- console.info(show"Predicting with 10 days of $actual in $reference")
-      result           <- quotations.flatMap { quotations =>
-                            quotations
-                              .filter(yearFilter(actual))
-                              .sliding(10, 10)
-                              .filter(_.size === 10)
-                              .toList
-                              .parTraverse { actual =>
-                                application2[IO](IO(quotations), IO(actual), upToYearFilter(reference))
-                              }
-                          }
-      (guesses, total) <- IO(result.filter(identity).size -> result.size)
-      _                <- logger.info(show"2010 até $actual\tJanela 10 dias de $reference\t$total\t$guesses")
-      _                <- console.info(show"Guessed $guesses correctly out of $total")
-    } yield ()
-
-  def biweeklyYear3(quotations: Quotations[IO], actual: Int, reference: Int): IO[Unit] =
-    for {
-      _                <- console.info(show"Predicting with 20 days of $actual in $reference")
-      result           <- quotations.flatMap { quotations =>
-                            quotations
-                              .filter(yearFilter(actual))
-                              .sliding(20, 20)
-                              .filter(_.size === 20)
-                              .toList
-                              .parTraverse { actual =>
-                                application2[IO](IO(quotations), IO(actual), upToYearFilter(reference))
-                              }
-                          }
-      (guesses, total) <- IO(result.filter(identity).size -> result.size)
-      _                <- logger.info(show"2010 até $actual\tJanela 20 dias de $reference\t$total\t$guesses")
-      _                <- console.info(show"Guessed $guesses correctly out of $total")
-    } yield ()
-
-  def weeklyYear(quotations: Quotations[IO], actual: Int, reference: Int): IO[Unit] =
-    for {
-      _       <- console.info(show"Predicting with 7 days of $actual in $reference")
-      guesses <- (1 to 12).toList
-                   .parFlatTraverse { month =>
-                     (0 to 3).toList.parTraverse { week =>
-                       application[IO](quotations, weeklyFilter(week, month, actual), yearFilter(reference))
-                     }
-                   }
-                   .nested
-                   .filter(identity)
-                   .value
-                   .map(_.size)
-      _       <- console.info(show"Guessed $guesses correctly out of 48")
-    } yield ()
-
-  def weeklyYear2(quotations: Quotations[IO], actual: Int, reference: Int): IO[Unit] =
-    for {
-      _                <- console.info(show"Predicting with 5 days of $actual in $reference")
-      result           <- quotations.flatMap { quotations =>
-                            quotations
-                              .filter(yearFilter(actual))
-                              .sliding(5, 5)
-                              .filter(_.size === 5)
-                              .toList
-                              .parTraverse { actual =>
-                                application2[IO](IO(quotations), IO(actual), upToYearFilter(reference))
-                              }
-                          }
-      (guesses, total) <- IO(result.filter(identity).size -> result.size)
-      _                <- logger.info(show"2010 até $actual\tJanela 5 dias de $reference\t$total\t$guesses")
-      _                <- console.info(show"Guessed $guesses correctly out of $total")
-    } yield ()
-
-  def goldenNumberYear(quotations: Quotations[IO], actual: Int, reference: Int): IO[Unit] =
-    for {
-      _                <- console.info(show"Predicting with 17 days of $actual in $reference")
-      result           <- quotations.flatMap { quotations =>
-                            quotations
-                              .filter(yearFilter(actual))
-                              .sliding(17, 17)
-                              .filter(_.size === 17)
-                              .toList
-                              .parTraverse { actual =>
-                                application2[IO](IO(quotations), IO(actual), upToYearFilter(reference))
-                              }
-                          }
-      (guesses, total) <- IO(result.filter(identity).size -> result.size)
-      _                <- logger.info(show"2010 até $actual\tJanela 17 dias de $reference\t$total\t$guesses")
-      _                <- console.info(show"Guessed $guesses correctly out of $total")
-    } yield ()
+  def goldenNumberYear[F[_]: Async: Logger: Trace: AlgorithmParser](
+      quotations: Quotations[F],
+      actual: Int,
+      reference: Int
+  ): F[Unit] =
+    Trace[F].span("golden-number") {
+      for {
+        _                <- Trace[F].put(("actual", actual), ("reference", reference))
+        result           <- quotations.flatMap { quotations =>
+                              quotations
+                                .filter(yearFilter(actual))
+                                .sliding(17, 17)
+                                .filter(_.size === 17)
+                                .toList
+                                .parTraverse { actual =>
+                                  application[F](quotations.pure[F], actual.pure[F], upToYearFilter(reference))
+                                }
+                            }
+        (guesses, total) <- Applicative[F].pure(result.count(identity) -> result.size)
+        _                <- Trace[F].put(("total", total), ("guesses", guesses))
+        _                <- Logger[F].info(show"2010 até $actual\tJanela 17 dias de $reference\t$total\t$guesses")
+      } yield ()
+    }
 
   // ----- Filters
 
@@ -233,58 +225,45 @@ object App extends IOApp.Simple {
 
   // ----- Base application
 
-  def application[F[_]: Async](quotations: Quotations[F], actualFilter: Filter, referenceFilter: Filter): F[Boolean] =
-    for {
-      predictor           <- quotationPredictor
-      (actual, reference) <- (prepare(quotations, actualFilter), prepare(quotations, referenceFilter)).parTupled
-      lastExchangeDate    <- getLastExchangeDate(actual)
-      expected            <- getExpectedResult(lastExchangeDate)(quotations)
-      predicted           <- predictor.predict(actual, reference)
-      // aligner             <- quotationAligner
-      // alignment           <- aligner.align(actual, reference)
-      // _                   <- Sync[F].blocking(println(show"Expected:  $expected\nPredicted: $predicted"))
-      // _                   <- Sync[F].blocking(println(alignment.show))
-    } yield expected === predicted
-
-  def application2[F[_]: Async](quotations: Quotations[F], actual: Quotations[F], referenceFilter: Filter): F[Boolean] =
+  def application[F[_]: Async: Trace: AlgorithmParser](
+      quotations: Quotations[F],
+      actual: Quotations[F],
+      referenceFilter: Filter
+  ): F[Boolean] =
     for {
       predictor        <- quotationPredictor
       actual           <- actual
       reference        <- prepare(quotations, referenceFilter)
       lastExchangeDate <- getLastExchangeDate(actual)
-      expected         <- getExpectedResult(lastExchangeDate)(quotations)
+      expected         <- getExpectedResult(implicitly[AlgorithmParser[F]])(lastExchangeDate)(quotations)
       predicted        <- predictor.predict(actual, reference)
-      // aligner             <- quotationAligner
-      // alignment           <- aligner.align(actual, reference)
-      // _                   <- Sync[F].blocking(println(show"Expected:  $expected\nPredicted: $predicted"))
-      // _                   <- Sync[F].blocking(println(alignment.show))
     } yield expected === predicted
 
-  def quotationPredictor[F[_]: Async]: F[QuotationPredictorUseCase[F]] =
+  def quotationPredictor[F[_]: Async: Trace: AlgorithmParser]: F[QuotationPredictorUseCase[F]] =
     for {
       matrix           <- Sync[F].delay(new BreezeMatrixAdapter[F, AlgorithmScore])
       scoreCalculator  <- Sync[F].delay(new ScoreCalculatorService[F])
-      algorithmParser  <- Sync[F].delay(new AlgorithmParserService[F])
       alignmentFinder  <- Sync[F].delay(new AlignmentFinderService(matrix))
       optimalAlignment <- Sync[F].delay(new OptimalAlignmentBuilderService(matrix, scoreCalculator))
-      usecase          <- Sync[F].delay(new QuotationPredictorService(algorithmParser, optimalAlignment, alignmentFinder))
+      usecase          <- Sync[F].delay {
+                            new QuotationPredictorService(implicitly[AlgorithmParser[F]], optimalAlignment, alignmentFinder)
+                          }
     } yield usecase
 
-  def quotationAligner[F[_]: Async]: F[QuotationAlignerUseCase[F]] =
+  def quotationAligner[F[_]: Async: Trace: AlgorithmParser]: F[QuotationAlignerUseCase[F]] =
     for {
       matrix           <- Sync[F].delay(new BreezeMatrixAdapter[F, AlgorithmScore])
       vector           <- Sync[F].delay(new BreezeVectorAdapter[F, AlgorithmToken])
       score            <- Sync[F].delay(new ScoreCalculatorService[F])
-      algorithmParser  <- Sync[F].delay(new AlgorithmParserService[F])
       alignmentFinder  <- Sync[F].delay(new AlignmentFinderService(matrix))
       optimalAlignment <- Sync[F].delay(new OptimalAlignmentBuilderService(matrix, score))
       optimalAlignment <- Sync[F].delay {
                             new OptimalAlignmentAlignerService(matrix, vector, score, alignmentFinder, optimalAlignment)
                           }
-      usecase          <- Sync[F].delay(new QuotationAlignerService(algorithmParser, optimalAlignment))
+      usecase          <- Sync[F].delay(new QuotationAlignerService(implicitly[AlgorithmParser[F]], optimalAlignment))
     } yield usecase
 
-  def load[F[_]: Async](filename: String): F[Vector[Quotation]] =
+  def load[F[_]: Async: Trace](filename: String): F[Vector[Quotation]] =
     for {
       url        <- Sync[F].blocking(getClass.getClassLoader.getResource(filename))
       path       <- Sync[F].blocking(Paths.get(url.toURI))
@@ -305,15 +284,19 @@ object App extends IOApp.Simple {
   def getLastExchangeDate[F[_]: Sync](quotations: Vector[Quotation]): F[jt.LocalDateTime] =
     Sync[F].delay(quotations.last.exchangeDate.value)
 
-  def getExpectedResult[F[_]: Async](date: jt.LocalDateTime)(quotations: F[Vector[Quotation]]): F[Option[Alphabet]] =
-    Sync[F].delay(new AlgorithmParserService[F]).flatMap { algorithmParser =>
-      Stream
-        .evalSeq(quotations)
-        .dropWhile(q => Order[jt.LocalDateTime].lteqv(q.exchangeDate.value, date))
-        .take(1)
-        .evalMap(algorithmParser.parse)
-        .map(_.value)
-        .compile
-        .last
-    }
+  def getExpectedResult[F[_]: Async](
+      algorithmParser: AlgorithmParserUseCase[F, Quotation, AlgorithmToken]
+  )(date: jt.LocalDateTime)(quotations: F[Vector[Quotation]]): F[Option[Alphabet]] = {
+    def before(date: jt.LocalDateTime)(quotation: Quotation): Boolean =
+      Order[jt.LocalDateTime].lteqv(quotation.exchangeDate.value, date)
+
+    Stream
+      .evalSeq(quotations)
+      .dropWhile(before(date))
+      .take(1)
+      .evalMap(algorithmParser.parse)
+      .map(_.value)
+      .compile
+      .last
+  }
 }

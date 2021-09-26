@@ -8,6 +8,7 @@ import cats.effect._
 import munit._
 
 import breeze.linalg._
+import natchez.Trace.Implicits._
 
 final class BreezeVectorAdapterSpec extends CatsEffectSuite {
 

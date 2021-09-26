@@ -9,14 +9,18 @@ import prediction.data.ports.services._
 
 import breeze.linalg._
 import breeze.math._
+import natchez.TraceValue._
+import natchez._
 
 import scala.reflect._
 
-final class BreezeMatrixAdapter[F[_]: Sync, Score: ClassTag: Semiring: Order]
+final class BreezeMatrixAdapter[F[_]: Sync: Trace, Score: ClassTag: Semiring: Order]
     extends MatrixServicePort[F, DenseMatrix, Score] {
 
   override def empty(n: Int, m: Int): F[DenseMatrix[Score]] =
-    Sync[F].delay(DenseMatrix.zeros[Score](n, m))
+    Trace[F].put(("matrix-rows", n), ("matrix-columns", m)) *> Trace[F].span("matrix-create") {
+      Sync[F].delay(DenseMatrix.zeros[Score](n, m))
+    }
 
   override def set(matrix: DenseMatrix[Score], i: Int, j: Int, value: Score): F[Unit] =
     Sync[F].delay(matrix(i, j) = value)
@@ -28,5 +32,7 @@ final class BreezeMatrixAdapter[F[_]: Sync, Score: ClassTag: Semiring: Order]
     Sync[F].delay(matrix.rows -> matrix.cols)
 
   override def maximumBy(matrix: DenseMatrix[Score], f: MatrixFilter): F[(Int, Int)] =
-    Sync[F].delay(matrix.iterator.filter(f)).map(_.maxBy(_._2)).map(_._1)
+    Trace[F].span("matrix-maximum-by") {
+      Sync[F].delay(matrix.iterator.filter(f)).map(_.maxBy(_._2)).map(_._1)
+    }
 }
